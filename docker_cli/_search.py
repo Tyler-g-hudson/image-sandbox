@@ -1,4 +1,7 @@
+import fnmatch
 import json
+import re
+
 from typing import Dict, Iterable, List, Optional, Union
 
 
@@ -71,6 +74,7 @@ def filtered_file_search(
     )
     return_items: List[Dict[str, Union[str, List[str]]]] = []
     for item in items:
+        # The item is a dict. Get all of the desired fields from it.
         new_item = {}
         for key in item:
             if key in fields:
@@ -148,8 +152,8 @@ def _accept_item(
     """
     item_name = item_dict["name"]
     for name in names:
-        if name == item_name:
-            return True
+        match_object = re.match(fnmatch.translate(name), item_name)
+        return True if match_object is not None else False
 
     item_tags = item_dict["tags"]
     for tag_list in tags:
