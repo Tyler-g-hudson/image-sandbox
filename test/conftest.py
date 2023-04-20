@@ -28,4 +28,4 @@ def pytest_sessionfinish(session, exitstatus):
     # This means that this line of code will only run once in pytest-xdist,
     # when all other test sessions have completed.
     if getattr(session.config, "workerinput", None) is None:
-        remove(tags=[f"{image_tag_prefix()}*"], force=True)
+        remove(tags=[f"{image_tag_prefix()}*"], force=True, quiet=True)
