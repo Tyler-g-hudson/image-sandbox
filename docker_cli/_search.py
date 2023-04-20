@@ -8,7 +8,8 @@ from typing import Dict, Iterable, List, Optional, Union
 def names_only_search(
         tags: Iterable[Optional[Iterable[str]]] = [],
         names: Iterable[Optional[str]] = [],
-        filename: str = "workflowdata.json"
+        filename: str = "workflowdata.json",
+        all: bool = False
 ) -> List[str]:
     """
     Searches a JSON file for items, returns their names.
@@ -23,6 +24,9 @@ def names_only_search(
         The names to be matched. Defaults to [].
     filename : str, optional
         The name of the file to search. Defaults to "workflowdata.json".
+    all : bool, optional
+        If True, ignores other options and returns all items in the file.
+        Defaults to False.
 
     Returns
     -------
@@ -30,9 +34,7 @@ def names_only_search(
         The "name" fields of all accepted items.
     """
     items: List[Dict[str, Union[str, List[str]]]] = search_file(
-        tags=tags,
-        names=names,
-        filename=filename
+        tags=tags, names=names, filename=filename, all=all
     )
     name_list: List[str] = []
     for item in items:
@@ -46,7 +48,8 @@ def filtered_file_search(
     fields: Iterable[str],
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: str = "workflowdata.json"
+    filename: str = "workflowdata.json",
+    all: bool = False
 ) -> List[Dict[str, Union[str, List[str]]]]:
     """
     Searches a JSON file, returns accepted items with only the given fields.
@@ -63,6 +66,9 @@ def filtered_file_search(
         The names to be matched. Defaults to [].
     filename : str, optional
         The name of the file to search. Defaults to "workflowdata.json".
+    all : bool, optional
+        If True, ignores other options and returns all items in the file.
+        Defaults to False.
 
     Returns
     -------
@@ -70,7 +76,7 @@ def filtered_file_search(
         The list of items accepted by the search, with filtered tags.
     """
     items: List[Dict[str, Union[str, List[str]]]] = search_file(
-        tags=tags, names=names, filename=filename
+        tags=tags, names=names, filename=filename, all=all
     )
     return_items: List[Dict[str, Union[str, List[str]]]] = []
     for item in items:
@@ -87,7 +93,8 @@ def filtered_file_search(
 def search_file(
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: str = "workflowdata.json"
+    filename: str = "workflowdata.json",
+    all: bool = False
 ) -> List[Dict[str, Union[str, List[str]]]]:
     """
     Return the list of unique objects in a JSON file that have given tags or name.
@@ -105,6 +112,9 @@ def search_file(
         The names to be matched. Defaults to [].
     filename : str, optional
         The name of the file to search. Defaults to "workflowdata.json".
+    all : bool, optional
+        If True, ignores other options and returns all items in the file.
+        Defaults to False.
 
     Returns
     -------
@@ -115,13 +125,14 @@ def search_file(
         json_dict = json.load(file)
 
     data: List[Dict[str, Union[str, List[str]]]] = json_dict["data"]
+    if all:
+        return data
     items: List[Dict[str, Union[str, List[str]]]] = list(
         filter(
             lambda x: _accept_item(x, tags, names),
             data
         )
     )
-
     return items
 
 
@@ -152,12 +163,15 @@ def _accept_item(
     """
     item_name = item_dict["name"]
     for name in names:
+        # Check for the name using a wildcard check.
         match_object = re.match(fnmatch.translate(name), item_name)
         return True if match_object is not None else False
 
     item_tags = item_dict["tags"]
+    # For each tag list in the overall set of lists,
     for tag_list in tags:
         assert tag_list is not None # MyPy complains without this line
+        # Match if the item contains each tag in the list.
         if all(tag in item_tags for tag in tag_list):
             return True
 
