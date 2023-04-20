@@ -187,11 +187,11 @@ class Image:
         except CalledProcessError as err:
             if dockerfile_build:
                 raise DockerBuildError(
-                    f"Dockerfile {tag} at {dockerfile} failed to build."
+                    message=f"Dockerfile {tag} at {dockerfile} failed to build."
                 ) from err
             else:
                 raise DockerBuildError(
-                    f"String dockerfile {tag} failed to build."
+                    message=f"String dockerfile {tag} failed to build."
                 ) from err
 
         return cls(tag)
@@ -336,7 +336,7 @@ class Image:
 
         Returns
         -------
-        List[str]
+        Iterable[str]
             The names of all commands in `commands` that were present on the
             image.
         """
