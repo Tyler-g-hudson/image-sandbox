@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import io
 import os
 from shlex import split
 from subprocess import DEVNULL, CalledProcessError, run
 from sys import stdin
-from typing import Any, List, Optional, Type, TypeVar, Union, overload
+from typing import Any, List, Iterable, Optional, Type, TypeVar, Union, overload
 
+from ._bind_mount import BindMount
 from ._exceptions import CommandNotFoundError, DockerBuildError, ImageNotFoundError
 
 
@@ -60,8 +63,7 @@ class Image:
         tag : str
             A name for the image.
         dockerfile : os.PathLike
-            The path of the Dockerfile to build
-            directory.
+            The path of the Dockerfile to build directory.
         context : os.PathLike, optional
             The build context. Defaults to ".".
         stdout : io.TextIOBase or special value, optional
@@ -185,11 +187,11 @@ class Image:
         except CalledProcessError as err:
             if dockerfile_build:
                 raise DockerBuildError(
-                    f"Dockerfile {tag} at {dockerfile} failed to build."
+                    message=f"Dockerfile {tag} at {dockerfile} failed to build."
                 ) from err
             else:
                 raise DockerBuildError(
-                    f"String Dockerfile {tag} failed to build."
+                    f"String dockerfile {tag} failed to build."
                 ) from err
 
         return cls(tag)
@@ -224,11 +226,13 @@ class Image:
         self,
         command: str,
         *,
-        stdout: Optional[Union[io.TextIOBase, int]] = None,
-        stderr: Optional[Union[io.TextIOBase, int]] = None,
+        stdout: io.TextIOBase | int | None = None,
+        stderr: io.TextIOBase | int | None = None,
         interactive: bool = False,
         network: str = "host",
         check: bool = True,
+        host_user: bool = False,
+        mounts: Iterable[BindMount] | None = None
     ) -> str:
         """
         Run the given command on a container.
@@ -253,6 +257,11 @@ class Image:
         check: bool, optional
             If True, check for CalledProcessErrors on non-zero return codes. Defualts
             to True.
+        host_user: bool, optional
+            If True, run the command as the user on the host machine, else run as the
+            default user. Defaults to False.
+        mounts : Iterable[BindMount], optional
+            A list of mount descriptions to apply to the run command.
 
         Returns
         -------
@@ -264,7 +273,13 @@ class Image:
         CommandNotFoundError:
             When a command is attempted that is not recognized on the image.
         """
+
         cmd = ["docker", "run", f"--network={network}", "--rm"]
+        if host_user:
+            cmd += ["-u", f"{os.getuid()}:{os.getgid()}"]
+        if mounts is not None:
+            for mount in mounts:
+                cmd += ["-v", f"{mount.mount_string()}"]
         if interactive:
             cmd += ["-i"]
             if stdin.isatty():
@@ -306,9 +321,30 @@ class Image:
         CommandNotFoundError:
             When bash is not recognized on the image.
         """
-        self.run(
-            "bash", interactive=True, network=network, check=False
-        )  # pragma: no cover
+        self.run(   # pragma: no cover
+            "bash",
+            interactive=True,
+            network=network,
+            check=False,
+            host_user=True
+        )
+
+    def check_command_availability(self, commands: Iterable[str]) -> List[str]:
+        """
+        Determines which of the commands in a list are present on the image.
+
+        Parameters
+        ----------
+        commands : Iterable[str]
+            The commands to be checked.
+
+        Returns
+        -------
+        Iterable[str]
+            The names of all commands in `commands` that were present on the
+            image.
+        """
+        return list(filter(self.has_command, commands))
 
     def has_command(self, command: str) -> bool:
         """

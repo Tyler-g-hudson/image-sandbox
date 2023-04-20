@@ -39,24 +39,21 @@ class TestImage:
             img = Image("malformed_image_name_or_id")
         assert img is None
 
-    def test_build_from_dockerfile(self, image_tag):
+    def test_build_from_dockerfile(self):
         """
-        Tests that the build method constructs and returns an Image when
+        Tests that the build method constructs and returns an Imagemage when
         given a Dockerfile.
         """
-        try:
-            img = Image.build(tag=str(image_tag), dockerfile="")
-            inspect_process = run(
-                split("docker inspect -f='{{.Id}}' " + image_tag),
-                text=True,
-                capture_output=True,
-            )
-            id = inspect_process.stdout.strip()
+        img = Image.build(tag="test")
+        inspect_process = run(
+            split("docker inspect -f='{{.Id}}' test"),
+            text=True,
+            capture_output=True)
+        id = inspect_process.stdout.strip()
 
-            assert img is not None
-            assert img.id == str(id)
-        finally:
-            remove_docker_image(image_tag)
+        assert img is not None
+        assert img.id == id
+        run(split("docker image remove test"))
 
     def test_build_from_dockerfile_output_to_file(self, image_tag):
         """

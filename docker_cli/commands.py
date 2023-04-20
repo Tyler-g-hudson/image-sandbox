@@ -1,11 +1,327 @@
 import os
+from pathlib import Path
 from shlex import split
 from subprocess import DEVNULL, PIPE, run
-from typing import Iterable, List, Union
+from typing import Dict, Iterable, List, Union
 
+from ._docker_cmake import (_cmake_build_dockerfile, _cmake_config_dockerfile,
+                            _cmake_install_dockerfile, build_prefix,
+                            install_prefix)
+from ._docker_distrib import distrib_dockerfile
+from ._docker_github import github_checkout_dockerfile
 from ._docker_mamba import mamba_lockfile_command
 from ._image import Image
-from ._utils import is_conda_pkg_name, universal_tag_prefix
+from ._bind_mount import BindMount
+from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
+
+
+def clone(
+    tag: str,
+    base: str,
+    repo: str,
+    branch: str
+):
+    """
+    Builds a docker image containing the requested GitHub repository.
+
+    .. note:
+        With this image, the workdir is moved to the github repo's root directory.
+
+    Parameters
+    ----------
+    tag : str
+        The image tag.
+    base : str
+        The base image tag.
+    repo : str
+        The name of the GitHub repo (in [USER]/[REPO_NAME] format)
+    branch : str
+        The name of the branch to be checked out.
+
+    Returns
+    -------
+    Image
+        The generated image.
+    """
+    dockerfile: Dockerfile = github_checkout_dockerfile(
+        github_repo=repo,
+        repo_branch=branch
+    )
+
+    prefix = universal_tag_prefix()
+    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
+    return dockerfile.build(
+        tag=img_tag,
+        base=base,
+        no_cache=True
+    )
+
+
+def configure(
+    tag: str,
+    base: str,
+    build_type: str
+) -> Image:
+    """
+    Produces an image with CMAKE configured.
+
+    Parameters
+    ----------
+    tag : str
+        The image tag.
+    base : str
+        The base image tag.
+    build_type : str
+        The type of CMAKE build.
+
+    Returns
+    -------
+    Image
+        The generated image.
+    """
+    dockerfile: Dockerfile = _cmake_config_dockerfile(build_type=build_type)
+
+    prefix = universal_tag_prefix()
+    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
+    return dockerfile.build(
+        tag=img_tag,
+        base=base,
+        no_cache=True
+    )
+
+
+def compile(
+    tag: str,
+    base: str
+) -> Image:
+    """
+    Produces an image with the working directory compiled.
+
+    Parameters
+    ----------
+    tag : str
+        The image tag.
+    base : str
+        The base image tag.
+
+    Returns
+    -------
+    Image
+        The generated image.
+    """
+    dockerfile: Dockerfile = _cmake_build_dockerfile()
+
+    prefix = universal_tag_prefix()
+    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
+    return dockerfile.build(
+        tag=img_tag,
+        base=base,
+        no_cache=True
+    )
+
+
+def install(
+    tag: str,
+    base: str
+) -> Image:
+    """
+    Produces an image with the compiled working directory code installed.
+
+    .. note:
+        With this image, the workdir is moved to $BUILD_PREFIX.
+
+    Parameters
+    ----------
+    tag : str
+        The image tag.
+    base : str
+        The base image tag.
+
+    Returns
+    -------
+    Image
+        The generated image.
+    """
+    image: Image = Image(base)
+
+    is_64_bit = test_image(
+        image=image,
+        expression='"$BUILD_PREFIX/lib64"'
+    )
+
+    if is_64_bit:
+        lib = "lib64"
+    else:
+        lib = "lib"
+
+    dockerfile: Dockerfile = _cmake_install_dockerfile(ld_lib=lib)
+
+    prefix = universal_tag_prefix()
+    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
+    return dockerfile.build(
+        tag=img_tag,
+        base=base,
+        no_cache=True
+    )
+
+
+def build_all(
+    tag: str,
+    base: str,
+    repo: str,
+    branch: str,
+    build_type: str
+) -> Dict[str, Image]:
+    """
+    Fully compiles and builds a GitHub repo with cmake.
+
+    Parameters
+    ----------
+    tag : str
+        The image tag prefix.
+    base : str
+        The base image tag.
+    repo : str
+        The name of the GitHub repo, in [USER]/[REPO_NAME] format
+    branch : str
+        The branch of the GitHub repo
+    build_type : str
+        The CMAKE build type
+
+    Returns
+    -------
+    Dict[str, Image]
+        A dict of images produced by this process.
+    """
+    prefix = universal_tag_prefix()
+
+    images: Dict[str, Image] = {}
+
+    git_repo_tag = f"{prefix}-{tag}-git-repo"
+    git_repo_image = clone(
+        base=base,
+        tag=git_repo_tag,
+        repo=repo,
+        branch=branch
+    )
+    images[git_repo_tag] = git_repo_image
+
+    configure_tag = f"{prefix}-{tag}-configured"
+    configure_image = configure(
+        tag=configure_tag,
+        base=git_repo_tag,
+        build_type=build_type
+    )
+    images[configure_tag] = configure_image
+
+    build_tag = f"{prefix}-{tag}-built"
+    build_image = compile(
+        tag=build_tag,
+        base=configure_tag
+    )
+    images[build_tag] = build_image
+
+    install_tag = f"{prefix}-{tag}-installed"
+    install_image = install(
+        tag=install_tag,
+        base=build_tag
+    )
+    images[install_tag] = install_image
+
+    return images
+
+
+def distributable(
+    tag: str,
+    base: str,
+    source_tag: str
+) -> Image:
+    """
+    Produces a distributable image.
+
+    Parameters
+    ----------
+    tag : str
+        The image tag.
+    base : str
+        The base image tag.
+    source_tag : str
+        The tag of the source image from which to acquire the install directory.
+
+    Returns
+    -------
+    Image
+        The generated image.
+    """
+    dockerfile: Dockerfile = distrib_dockerfile(
+        source_tag=source_tag,
+        source_path=install_prefix(),
+        distrib_path=install_prefix()
+    )
+
+    return dockerfile.build(
+        tag=tag,
+        base=base,
+        no_cache=True
+    )
+
+
+def test(
+    tag: str,
+    logfile: Union[os.PathLike[str], str],
+    compress_output: bool,
+    quiet_fail: bool
+) -> None:
+    """
+    Run all ctests from the docker image work directory.
+
+    Parameters
+    ----------
+    tag : str
+        The tag of the image to test.
+    logfile : Union[os.PathLike[str], str]
+        The name of the XML test output file.
+    compress_output : bool
+        If True, compress the output of the test.
+    quiet_fail : bool
+        If True, don't output on failure.
+    """
+    host_volume_path = "./Testing/Temps"
+    image_volume_path = "/tmp/Testing"
+    image: Image = Image(tag)
+
+    test_cmd = ["(", "ctest"]
+
+    # Add arguments
+    if not compress_output:
+        test_cmd += ["--no-compress-output"]
+    if not quiet_fail:
+        test_cmd += ["--output-on-failure"]
+
+    test_cmd += ["-T", "Test", "||", "true", ")"]
+    file_cmd = [
+        "cp",
+        f"{build_prefix()}/Testing/*/Test.xml",
+        f"{image_volume_path}/{logfile}"
+    ]
+
+    cmd = test_cmd + ["&&"] + file_cmd
+
+    host_vol_abspath = Path(host_volume_path).resolve()
+    host_vol_abspath.parent.mkdir(parents=True, exist_ok=True)
+
+    mount = BindMount(
+        image_mount_point=image_volume_path,
+        host_mount_point=host_vol_abspath,
+        permissions="rw"
+    )
+
+    command = ' '.join(cmd)
+    image.run(
+        command=command,
+        host_user=True,
+        mounts=[mount]
+    )
 
 
 def dropin(tag: str) -> None:

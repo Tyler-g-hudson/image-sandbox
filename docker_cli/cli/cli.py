@@ -4,6 +4,7 @@ from typing import Sequence
 
 from .._utils import universal_tag_prefix
 from ._utils import help_formatter
+from .build_commands import build_command_names, init_build_parsers, run_build
 from .setup_commands import init_setup_parsers, run_setup
 from .util_commands import init_util_parsers, run_util
 
@@ -24,6 +25,7 @@ def initialize_parser() -> argparse.ArgumentParser:
     # Add arguments
     subparsers = parser.add_subparsers(dest="command", required=True)
 
+    init_build_parsers(subparsers, prefix)
     init_setup_parsers(subparsers, prefix)
     init_util_parsers(subparsers, prefix)
 
@@ -37,5 +39,7 @@ def main(args: Sequence[str] = sys.argv[1:]):
     del args_parsed.command
     if command == "setup":
         run_setup(args_parsed)
+    elif command in build_command_names():
+        run_build(args_parsed, command)
     else:
         run_util(args_parsed, command)
