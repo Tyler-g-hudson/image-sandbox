@@ -14,7 +14,7 @@ def mamba_install_dockerfile(
 
     Parameters
     ----------
-    env_reqs_file : Path, optional
+    env_reqs_file : Path
         The path to the requirements file.
 
     Returns
