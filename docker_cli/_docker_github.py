@@ -2,14 +2,13 @@ import re
 from textwrap import dedent
 
 from ._docker_mamba import micromamba_docker_lines
-from ._dockerfile import Dockerfile
 
 
 def _github_checkout_dockerfile(
     github_repo: str,
     repo_branch: str = "",
     git_url: str = "https://github.com"
-) -> Dockerfile:
+) -> str:
     """
     Generates a dockerfile that has instructions to checkout a github repo.
 
@@ -22,8 +21,8 @@ def _github_checkout_dockerfile(
 
     Returns
     -------
-    Dockerfile
-        The generated dockerfile.
+    str
+        The generated dockerfile body.
     """
     # Check that the repo pattern
     github_repo_pattern = re.compile(
@@ -54,6 +53,4 @@ def _github_checkout_dockerfile(
         WORKDIR /{repo_name}/
         USER $DEFAULT_USER
     """).strip() + "\n"
-
-    dockerfile: Dockerfile = Dockerfile(body=body)
-    return dockerfile
+    return body
