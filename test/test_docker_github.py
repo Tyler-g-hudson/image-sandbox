@@ -1,6 +1,5 @@
 from pytest import raises
 
-from docker_cli import Dockerfile
 from docker_cli._docker_github import _github_checkout_dockerfile
 
 from .utils import rough_dockerfile_validity_check
@@ -8,10 +7,11 @@ from .utils import rough_dockerfile_validity_check
 
 def test_github_dockerfile():
     """Performs a rough validity check of the GitHub dockerfile"""
-    dockerfile: Dockerfile = _github_checkout_dockerfile(
+    dockerfile: str = _github_checkout_dockerfile(
         github_repo="abc/def", repo_branch="ghi"
     )
-    rough_dockerfile_validity_check(dockerfile=dockerfile.full_dockerfile(parent="a"))
+    dockerfile = f"FROM %TEST_BASE%\n\n{dockerfile}"
+    rough_dockerfile_validity_check(dockerfile=dockerfile)
 
 
 def test_github_dockerfile_error():

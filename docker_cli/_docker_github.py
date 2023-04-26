@@ -2,7 +2,6 @@ import re
 from textwrap import dedent
 
 from ._docker_mamba import micromamba_docker_lines
-from ._dockerfile import Dockerfile
 
 
 def _github_checkout_dockerfile(
@@ -20,8 +19,8 @@ def _github_checkout_dockerfile(
 
     Returns
     -------
-    Dockerfile
-        The generated dockerfile.
+    str
+        The generated dockerfile body.
     """
     # Check that the repo pattern
     github_repo_pattern = re.compile(
