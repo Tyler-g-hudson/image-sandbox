@@ -46,9 +46,8 @@ class TestImage:
         """
         img = Image.build(tag="test")
         inspect_process = run(
-            split("docker inspect -f='{{.Id}}' test"),
-            text=True,
-            capture_output=True)
+            split("docker inspect -f='{{.Id}}' test"), text=True, capture_output=True
+        )
         id = inspect_process.stdout.strip()
 
         assert img is not None

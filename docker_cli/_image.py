@@ -5,7 +5,7 @@ import os
 from shlex import split
 from subprocess import DEVNULL, CalledProcessError, run
 from sys import stdin
-from typing import Any, List, Iterable, Optional, Type, TypeVar, Union, overload
+from typing import Any, Iterable, List, Optional, Type, TypeVar, Union, overload
 
 from ._bind_mount import BindMount
 from ._exceptions import CommandNotFoundError, DockerBuildError, ImageNotFoundError
@@ -232,7 +232,7 @@ class Image:
         network: str = "host",
         check: bool = True,
         host_user: bool = False,
-        mounts: Iterable[BindMount] | None = None
+        mounts: Iterable[BindMount] | None = None,
     ) -> str:
         """
         Run the given command on a container.
@@ -321,12 +321,8 @@ class Image:
         CommandNotFoundError:
             When bash is not recognized on the image.
         """
-        self.run(   # pragma: no cover
-            "bash",
-            interactive=True,
-            network=network,
-            check=False,
-            host_user=True
+        self.run(  # pragma: no cover
+            "bash", interactive=True, network=network, check=False, host_user=True
         )
 
     def check_command_availability(self, commands: Iterable[str]) -> List[str]:

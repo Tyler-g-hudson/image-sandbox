@@ -1,15 +1,15 @@
 import fnmatch
 import json
+import os
 import re
-
 from typing import Dict, Iterable, List, Optional, Union
 
 
 def names_only_search(
-        tags: Iterable[Optional[Iterable[str]]] = [],
-        names: Iterable[Optional[str]] = [],
-        filename: str = "workflowdata.json",
-        all: bool = False
+    tags: Iterable[Optional[Iterable[str]]] = [],
+    names: Iterable[Optional[str]] = [],
+    filename: Union[os.PathLike[str], str] = "workflowdata.json",
+    all: bool = False,
 ) -> List[str]:
     """
     Searches a JSON file for items, returns their names.
@@ -33,7 +33,7 @@ def names_only_search(
     List[str]
         The "name" fields of all accepted items.
     """
-    items: List[Dict[str, Union[str, List[str]]]] = search_file(
+    items: List[Dict[str, Union[str, Dict[str, str]]]] = search_file(
         tags=tags, names=names, filename=filename, all=all
     )
     name_list: List[str] = []
@@ -48,9 +48,9 @@ def filtered_file_search(
     fields: Iterable[str],
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: str = "workflowdata.json",
-    all: bool = False
-) -> List[Dict[str, Union[str, List[str]]]]:
+    filename: Union[os.PathLike[str], str] = "workflowdata.json",
+    all: bool = False,
+) -> List[Dict[str, Union[str, Dict[str, str]]]]:
     """
     Searches a JSON file, returns accepted items with only the given fields.
 
@@ -75,10 +75,10 @@ def filtered_file_search(
     List[Dict[str, Union[str, List[str]]]]
         The list of items accepted by the search, with filtered tags.
     """
-    items: List[Dict[str, Union[str, List[str]]]] = search_file(
+    items: List[Dict[str, Union[str, Dict[str, str]]]] = search_file(
         tags=tags, names=names, filename=filename, all=all
     )
-    return_items: List[Dict[str, Union[str, List[str]]]] = []
+    return_items: List[Dict[str, Union[str, Dict[str, str]]]] = []
     for item in items:
         # The item is a dict. Get all of the desired fields from it.
         new_item = {}
@@ -93,9 +93,9 @@ def filtered_file_search(
 def search_file(
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: str = "workflowdata.json",
-    all: bool = False
-) -> List[Dict[str, Union[str, List[str]]]]:
+    filename: Union[os.PathLike[str], str] = "workflowdata.json",
+    all: bool = False,
+) -> List[Dict[str, Union[str, Dict[str, str]]]]:
     """
     Return the list of unique objects in a JSON file that have given tags or name.
 
@@ -124,22 +124,19 @@ def search_file(
     with open(file=filename) as file:
         json_dict = json.load(file)
 
-    data: List[Dict[str, Union[str, List[str]]]] = json_dict["data"]
+    data: List[Dict[str, Union[str, Dict[str, str]]]] = json_dict["data"]
     if all:
         return data
-    items: List[Dict[str, Union[str, List[str]]]] = list(
-        filter(
-            lambda x: _accept_item(x, tags, names),
-            data
-        )
+    items: List[Dict[str, Union[str, Dict[str, str]]]] = list(
+        filter(lambda x: _accept_item(x, tags, names), data)
     )
     return items
 
 
 def _accept_item(
-    item_dict: Dict[str, Union[str, List[str]]],
+    item_dict: Dict[str, Union[str, Dict[str, str]]],
     tags: Iterable[Optional[Iterable[str]]],
-    names: Iterable[Optional[str]]
+    names: Iterable[Optional[str]],
 ) -> bool:
     """
     Accepts or rejects an item.
@@ -162,7 +159,9 @@ def _accept_item(
         Else False.
     """
     item_name = item_dict["name"]
+    assert isinstance(item_name, str)
     for name in names:
+        assert isinstance(name, str)
         # Check for the name using a wildcard check.
         match_object = re.match(fnmatch.translate(name), item_name)
         return True if match_object is not None else False
@@ -170,7 +169,7 @@ def _accept_item(
     item_tags = item_dict["tags"]
     # For each tag list in the overall set of lists,
     for tag_list in tags:
-        assert tag_list is not None # MyPy complains without this line
+        assert tag_list is not None  # MyPy complains without this line
         # Match if the item contains each tag in the list.
         if all(tag in item_tags for tag in tag_list):
             return True

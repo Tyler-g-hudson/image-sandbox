@@ -1,7 +1,6 @@
 from textwrap import dedent
 
 from ._docker_mamba import micromamba_docker_lines
-from ._dockerfile import Dockerfile
 
 
 def install_prefix() -> str:
@@ -28,9 +27,7 @@ def build_prefix() -> str:
     return "/tmp/build"
 
 
-def _cmake_config_dockerfile(
-    build_type: str
-) -> Dockerfile:
+def cmake_config_dockerfile(build_type: str) -> str:
     """
     Creates a dockerfile for configuring CMAKE.
 
@@ -41,10 +38,14 @@ def _cmake_config_dockerfile(
 
     Returns
     -------
-    Dockerfile
-        The generated Dockerfile.
+    str
+        The generated Dockerfile body.
     """
-    body = micromamba_docker_lines() + "\n\n" + dedent(f"""
+    body = (
+        micromamba_docker_lines()
+        + "\n\n"
+        + dedent(
+            f"""
         ENV INSTALL_PREFIX {install_prefix()}
         ENV BUILD_PREFIX {build_prefix()}
         ENV PYTHONPATH $INSTALL_PREFIX/packages:$PYTHONPATH
@@ -56,29 +57,32 @@ def _cmake_config_dockerfile(
             -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \\
             -DCMAKE_PREFIX_PATH=$MAMBA_ROOT_PREFIX \\
             .
-    """).strip()
+    """
+        ).strip()
+    )
 
-    dockerfile: Dockerfile = Dockerfile(body=body)
-    return dockerfile
+    return body
 
 
-def _cmake_build_dockerfile() -> Dockerfile:
+def cmake_build_dockerfile() -> str:
     """
     Creates a dockerfile for compiling with CMAKE.
 
     Returns
     -------
-    Dockerfile
-        The generated Dockerfile.
+    str
+        The generated Dockerfile body.
     """
-    body = micromamba_docker_lines() + "\n\n" + \
-        "RUN cmake --build $BUILD_PREFIX --parallel"
+    body = (
+        micromamba_docker_lines()
+        + "\n\n"
+        + "RUN cmake --build $BUILD_PREFIX --parallel"
+    )
 
-    dockerfile: Dockerfile = Dockerfile(body=body)
-    return dockerfile
+    return body
 
 
-def _cmake_install_dockerfile(ld_lib: str) -> Dockerfile:
+def cmake_install_dockerfile(ld_lib: str) -> str:
     """
     Creates a dockerfile for installing with CMAKE.
 
@@ -89,10 +93,14 @@ def _cmake_install_dockerfile(ld_lib: str) -> Dockerfile:
 
     Returns
     -------
-    Dockerfile
-        The generated Dockerfile.
+    str
+        The generated Dockerfile body.
     """
-    body = micromamba_docker_lines() + "\n\n" + dedent(f"""
+    body = (
+        micromamba_docker_lines()
+        + "\n\n"
+        + dedent(
+            f"""
         USER root
         RUN cmake --build $BUILD_PREFIX --target install --parallel
         RUN chmod -R 777 $BUILD_PREFIX
@@ -102,7 +110,8 @@ def _cmake_install_dockerfile(ld_lib: str) -> Dockerfile:
 
         ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$INSTALL_PREFIX/{ld_lib}
         WORKDIR $BUILD_PREFIX
-    """).strip()
+    """
+        ).strip()
+    )
 
-    dockerfile: Dockerfile = Dockerfile(body=body)
-    return dockerfile
+    return body
