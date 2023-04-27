@@ -164,7 +164,8 @@ def _accept_item(
         assert isinstance(name, str)
         # Check for the name using a wildcard check.
         match_object = re.match(fnmatch.translate(name), item_name)
-        return True if match_object is not None else False
+        if match_object is not None:
+            return True
 
     item_tags = item_dict["tags"]
     # For each tag list in the overall set of lists,

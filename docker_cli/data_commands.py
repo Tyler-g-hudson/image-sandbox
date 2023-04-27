@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from subprocess import PIPE, list2cmdline
+from subprocess import PIPE, list2cmdline, run
 from typing import Dict, Iterable, List, Union
 
 from ._bind_mount import BindMount
@@ -124,7 +124,11 @@ def data_fetch(
         command="echo $MOUNT_LOCATION", stdout=PIPE
     ).strip()
 
-    host_mount_abspath = Path(mount).resolve()
+    host_mount_path = Path(mount)
+    if not host_mount_path.is_dir():
+        cmd = ["mkdir", "-p", mount]
+        run(cmd, check=True)
+    host_mount_abspath = host_mount_path.resolve()
 
     mount_point = BindMount(
         src=host_mount_abspath,
