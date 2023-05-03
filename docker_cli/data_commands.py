@@ -1,7 +1,8 @@
 import json
 import os
+import threading
 from pathlib import Path
-from subprocess import PIPE, list2cmdline, run
+from subprocess import DEVNULL, PIPE, list2cmdline, run
 from typing import Dict, Iterable, List, Union
 
 from ._bind_mount import BindMount
@@ -98,6 +99,7 @@ def data_fetch(
     mount: Union[os.PathLike[str], str],
     all: bool = False,
     no_cache: bool = False,
+    verbose_stderr: bool = False
 ) -> None:
     """
     Fetch and cache the set of items that were returned by a query on a database file.
@@ -114,10 +116,12 @@ def data_fetch(
     mount : os.PathLike[str]
         The location of the cache on the local machine.
     all : bool, optional
-        If true, return all of the items in the database. Defaults to False
+        If true, return all of the items in the database. Defaults to False.
     no_cache : bool, optional
         If true, return all of the items from the local cache before reinstalling.
-        Defaults to False
+        Defaults to False.
+    verbose_stderr : bool, optional
+        If true, suppress stderr output during fetch. Defaults to False.
     """
     rover_image = Image("rover")
     image_mount_loc = rover_image.run(
@@ -140,20 +144,26 @@ def data_fetch(
         file=file, tags=tags, names=names, fields=["name", "url", "files"], all=all
     )
 
+    tasks: List[threading.Thread] = []
+
     for data_item in data_values:
-        _request_data_item(
-            data_item=data_item,
-            rover_image=rover_image,
-            mount_point=mount_point,
-            no_cache=no_cache
-        )
+        tasks.append(threading.Thread(
+            target=_request_data_item,
+            args=(data_item, mount_point, no_cache, verbose_stderr),
+            name=f"{data_item}_DOWNLOADER"
+        ))
+
+    for task in tasks:
+        task.start()
+    for task in tasks:
+        task.join()
 
 
 def _request_data_item(
     data_item: Dict[str, Union[str, Dict[str, str]]],
-    rover_image: Image,
     mount_point: Mount,
-    no_cache: bool
+    no_cache: bool,
+    verbose_stderr: bool
 ) -> None:
     """
     Given a description of a data item, use a given image to fetch and cache its files.
@@ -168,8 +178,16 @@ def _request_data_item(
         The location of the cache on the local machine.
     no_cache : bool, optional
         If true, return all of the items from the local cache before reinstalling.
-        Defaults to False
+        Defaults to False.
+    verbose_stderr : bool, optional
+        If true, suppress stderr output during fetch. Defaults to False.
+
+    Returns
+    -------
+    asyncio.Task
+        The async task associated with fetching the data.
     """
+    rover_image = Image("rover")
     repo = data_item["name"]
     assert isinstance(repo, str)
     url = data_item["url"]
@@ -195,4 +213,12 @@ def _request_data_item(
         cmd += [kvp]
 
     command = list2cmdline(cmd)
-    rover_image.run(command=command, host_user=True, mounts=[mount_point])
+
+    stderr = None if verbose_stderr else DEVNULL
+
+    rover_image.run(
+        command=command,
+        host_user=True,
+        mounts=[mount_point],
+        stderr=stderr
+    )

@@ -1,0 +1,330 @@
+{
+  "rslc": {
+    "type": "singletest",
+    "subtests": {
+      "rslc_REE1": {
+        "runconfig": "rslc_REE1.yaml",
+        "inputs": "L0B_RRSD_REE1"
+      },
+
+      "rslc_REE2": {
+        "runconfig": "rslc_REE2.yaml",
+        "inputs": "L0B_RRSD_REE2"
+      },
+
+      "rslc_REE_NISAR_dithered": {
+        "runconfig": "rslc_REE_NISAR_dithered.yaml",
+        "inputs": "L0B_RRSD_REE_NISAR_dithered"
+      },
+
+      "rslc_DIST1": {
+        "runconfig": "rslc_DIST1.yaml",
+        "inputs": "L0B_RRSD_DIST1"
+      },
+
+      "rslc_DIST2": {
+        "runconfig": "rslc_DIST2.yaml",
+        "inputs": "L0B_RRSD_DIST2"
+      },
+
+      "rslc_ALPSRP037370690": {
+        "runconfig": "rslc_ALPSRP037370690.yaml",
+        "inputs": "L0B_RRSD_ALPSRP037370690"
+      },
+
+      "rslc_ALPSRP271200680": {
+        "runconfig": "rslc_ALPSRP271200680.yaml",
+        "inputs": "L0B_RRSD_ALPSRP271200680"
+      }
+    }
+  },
+
+  "doppler": {
+    "type": "singletest",
+    "subtests": {
+      "doppler_ALPSRP264757150_Amazon": {
+        "runconfig": "doppler_ALPSRP264757150_Amazon.txt",
+        "inputs": "L0B_RRSD_ALPSRP264757150_Amazon"
+      },
+
+      "doppler_DM2_REE_AMAZON_PASS1": {
+        "runconfig": "doppler_DM2_REE_AMAZON_PASS1.txt",
+        "inputs": "L0B_RRSD_DM2_REE_AMAZON_PASS1"
+      }
+    }
+  },
+
+  "el_edge": {
+    "type": "singletest",
+    "subtests": {
+      "el_edge_ALPSRP264757150_Amazon": {
+        "runconfig": "el_edge_ALPSRP264757150_Amazon.txt",
+        "inputs": "L0B_RRSD_ALPSRP264757150_Amazon"
+      }
+    }
+  },
+
+  "el_null": {
+    "type": "singletest",
+    "subtests": {
+      "el_null_REE_CHANNEL4_EXTSCENE_PASS1": {
+        "runconfig": "el_null_REE_CHANNEL4_EXTSCENE_PASS1.txt",
+        "inputs": "L0B_RRSD_REE_CHANNEL4_EXTSCENE_PASS1"
+      },
+
+      "el_null_DM2_REE_AMAZON_PASS1": {
+        "runconfig": "el_null_DM2_REE_AMAZON_PASS1.txt",
+        "inputs": "L0B_RRSD_DM2_REE_AMAZON_PASS1"
+      }
+    }
+  },
+
+  "gslc": {
+    "type": "singletest",
+    "subtests": {
+      "gslc_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05": {
+        "runconfig": "gslc_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05.yaml",
+        "inputs": "L1_RSLC_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05"
+      },
+
+      "gslc_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_0": {
+        "runconfig": "gslc_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_0.yaml",
+        "inputs": "L1_RSLC_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_03"
+      },
+
+      "gslc_UAVSAR_NISARP_32039_19052_004_190726_L090_CX_129_02": {
+        "runconfig": "gslc_UAVSAR_NISARP_32039_19052_004_190726_L090_CX_129_02.yaml",
+        "inputs": "L1_RSLC_UAVSAR_NISARP_32039_19052_004_190726_L090_CX_129_02"
+      },
+
+      "gslc_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03": {
+        "runconfig": "gslc_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03.yaml",
+        "inputs": "L1_RSLC_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03"
+      },
+
+      "gslc_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02": {
+        "runconfig": "gslc_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02.yaml",
+        "inputs": "L1_RSLC_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02"
+      },
+
+      "gslc_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02": {
+        "runconfig": "gslc_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02.yaml",
+        "inputs": "L1_RSLC_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02"
+      },
+
+      "gslc_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02": {
+        "runconfig": "gslc_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02.yaml",
+        "inputs": "L1_RSLC_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02"
+      }
+    }
+  },
+
+  "gcov": {
+    "type": "singletest",
+    "subtests": {
+      "gcov_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05": {
+        "runconfig": "gcov_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05.yaml",
+        "inputs": "L1_RSLC_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05"
+      },
+
+      "gcov_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_03": {
+        "runconfig": "gcov_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_03.yaml",
+        "inputs": "L1_RSLC_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_03"
+      },
+
+      "gcov_S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F": {
+        "runconfig": "gcov_S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.yaml",
+        "inputs": "L1_RSLC_S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F"
+      },
+
+      "gcov_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03": {
+        "runconfig": "gcov_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03.yaml",
+        "inputs": "L1_RSLC_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03"
+      },
+
+      "gcov_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02": {
+        "runconfig": "gcov_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02.yaml",
+        "inputs": "L1_RSLC_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02"
+      },
+
+      "gcov_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02": {
+        "runconfig": "gcov_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02.yaml",
+        "inputs": "L1_RSLC_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02"
+      },
+
+      "gcov_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02": {
+        "runconfig": "gcov_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02.yaml",
+        "inputs": "L1_RSLC_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02"
+      }
+    }
+  },
+
+  "noisest": {
+    "type": "singletest",
+    "subtests": {
+      "noisest_REE_BF_NET": {
+        "runconfig": "noisest_REE_BF_NET.txt",
+        "inputs": "L0B_RRSD_REE_BF_NET"
+      }
+    }
+  },
+
+  "pta": {
+    "type": "singletest",
+    "subtests": {
+      "pta_REE_PTA": {
+        "runconfig": "pta_REE_PTA.txt",
+        "inputs": "L1_RSLC_REE_PTA"
+      }
+    }
+  },
+
+  "soilm": {
+    "type": "singletest",
+    "subtests": {
+      "soilm_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001": {
+        "runconfig": "soilm_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001.txt",
+        "inputs": "L2_GCOV_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001"
+      }
+    }
+  },
+
+  "insar": {
+    "type": "singletest",
+    "subtests": {
+      "insar_UAVSAR_NISARP_32039_19049-005_19052-004_129": {
+        "runconfig": "insar_UAVSAR_NISARP_32039_19049-005_19052-004_129.yaml",
+        "inputs": {
+          "ref": "L1_RSLC_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_03",
+          "sec": "L1_RSLC_UAVSAR_NISARP_32039_19052_004_190726_L090_CX_129_02"
+        }
+      },
+
+      "insar_UAVSAR_SanAnd_05518_12018-000_12128-008_143": {
+        "runconfig": "insar_UAVSAR_SanAnd_05518_12018-000_12128-008_143.yaml",
+        "inputs": {
+          "ref": "L1_RSLC_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03",
+          "sec": "L1_RSLC_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02"
+        }
+      },
+
+      "insar_UAVSAR_Snjoaq_14511_18034-014_18044-015_143": {
+        "runconfig": "insar_UAVSAR_Snjoaq_14511_18034-014_18044-015_143.yaml",
+        "inputs": {
+          "ref": "L1_RSLC_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02",
+          "sec": "L1_RSLC_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02"
+        }
+      }
+    }
+  },
+
+  "end2end": {
+    "type": "multitest",
+    "subtests": {
+      "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile": {
+        "inputs": {
+          "ref": "L0B_RRSD_ALPSRP262866750_Chile",
+          "sec": "L0B_RRSD_ALPSRP269576750_Chile"
+        },
+        "series": [
+          {
+            "workflow": "rslc",
+            "runconfig": "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile_rslc_ref.yaml",
+            "inputs": "L0B_RRSD_ALPSRP262866750_Chile"
+          },
+
+          {
+            "workflow": "rslc",
+            "runconfig": "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile_rslc_sec.yaml",
+            "inputs": "L0B_RRSD_ALPSRP269576750_Chile"
+          },
+
+          {
+            "workflow": "gslc",
+            "runconfig": "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile_gslc_ref.yaml",
+            "inputs": ["rslc_ref", "L0B_RRSD_ALPSRP262866750_Chile"]
+          },
+
+          {
+            "workflow": "gslc",
+            "runconfig": "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile_gslc_sec.yaml",
+            "inputs": ["rslc_sec", "L0B_RRSD_ALPSRP269576750_Chile"]
+          },
+
+          {
+            "workflow": "gcov",
+            "runconfig": "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile_gcov_ref.yaml",
+            "inputs": ["rslc_ref", "L0B_RRSD_ALPSRP262866750_Chile"]
+          },
+
+          {
+            "workflow": "gcov",
+            "runconfig": "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile_gcov_sec.yaml",
+            "inputs": ["rslc_sec", "L0B_RRSD_ALPSRP269576750_Chile"]
+          },
+
+          {
+            "workflow": "insar",
+            "runconfig": "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile_insar.yaml",
+            "inputs": ["rslc_ref", "rslc_sec", "L0B_RRSD_ALPSRP262866750_Chile"]
+          }
+        ]
+      },
+
+      "end2end_pair_ALPSRP110160680_ALPSRP116870680_Rosamond": {
+        "inputs": {
+          "ref": "L0B_RRSD_ALPSRP110160680_Rosamond",
+          "sec": "L0B_RRSD_ALPSRP116870680_Rosamond"
+        },
+        "series": [
+          {
+            "workflow": "rslc",
+            "runconfig": "end2end_pair_ALPSRP110160680_ALPSRP116870680_Rosamond_rslc_ref.yaml",
+            "inputs": "L0B_RRSD_ALPSRP110160680_Rosamond"
+          },
+
+          {
+            "workflow": "rslc",
+            "runconfig": "end2end_pair_ALPSRP110160680_ALPSRP116870680_Rosamond_rslc_sec.yaml",
+            "inputs": "L0B_RRSD_ALPSRP116870680_Rosamond"
+          },
+
+          {
+            "workflow": "gslc",
+            "runconfig": "end2end_pair_ALPSRP110160680_ALPSRP116870680_Rosamond_gslc_ref.yaml",
+            "inputs": ["rslc_ref", "L0B_RRSD_ALPSRP110160680_Rosamond"]
+          },
+
+          {
+            "workflow": "gslc",
+            "runconfig": "end2end_pair_ALPSRP110160680_ALPSRP116870680_Rosamond_gslc_sec.yaml",
+            "inputs": ["rslc_sec", "L0B_RRSD_ALPSRP116870680_Rosamond"]
+          },
+
+          {
+            "workflow": "gcov",
+            "runconfig": "end2end_pair_ALPSRP110160680_ALPSRP116870680_Rosamond_gcov_ref.yaml",
+            "inputs": ["rslc_ref", "L0B_RRSD_ALPSRP110160680_Rosamond"]
+          },
+
+          {
+            "workflow": "gcov",
+            "runconfig": "end2end_pair_ALPSRP110160680_ALPSRP116870680_Rosamond_gcov_sec.yaml",
+            "inputs": ["rslc_sec", "L0B_RRSD_ALPSRP116870680_Rosamond"]
+          },
+
+          {
+            "workflow": "insar",
+            "runconfig": "end2end_pair_ALPSRP110160680_ALPSRP116870680_Rosamond_insar.yaml",
+            "inputs": [
+              "rslc_sec",
+              "rslc_ref",
+              "L0B_RRSD_ALPSRP110160680_Rosamond",
+              "L0B_RRSD_ALPSRP116870680_Rosamond"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

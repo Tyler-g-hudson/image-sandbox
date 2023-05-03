@@ -1,0 +1,319 @@
+{
+  "data": [
+    {
+      "name": "L0B_RRSD_REE1",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_REE1",
+      "files": {
+        "REE_CR_INFO_out17.csv": "sha256:88c880262e1a265fe3ff85556216a6056839634b4597d0c3bbac4f5e7a94a5b5",
+        "REE_L0B_out17.h5": "sha256:12fde3e061a2fa0300194afd64da594a8f2547dbe2016c0d0400b633adfe50c4",
+        "README.txt": "sha256:ecc582552f09ed966300a776d9fd354d8a65d0651240281642f050cf49db381a",
+        "attitude.xml": "sha256:cf9df36668494479cd9fddf6466964580def07c2540f7abe634b627774a42f45",
+        "orbit.xml": "sha256:0b60876e8cd7a6717c53a0a847d129977555fac74a79d306d9276bbf0e8a702e"
+      }
+    },
+    {
+      "name": "L0B_RRSD_REE2",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_REE2",
+      "files": {
+        "attitude.xml": "sha256:cf9e85221ff0cfd0da5e09f88454887106e93ee2f04204792d0f197a997d178e",
+        "orbit.xml": "sha256:b98a3e1c5d4a19842f55a94dde54d19c166693be0b84cb600e3ad4f61ea9e0f1",
+        "NISAR_LCAL_20220101T120000_01.yaml": "sha256:8fc1611437ffe2224e631951c340b46f58f7dc832f08764842c8a5c63ea750d9",
+        "NISAR_LINS_20220101T120000_01.h5": "sha256:6464359fd66cced74c2aeabd4d9279c2196026c7fc0f3de82fedfc396d3457cd",
+        "REE_L0B_ECHO_array144sq_03.h5": "sha256:831cffd710686bed8148ddfe8f66aa254320a9b54cf81efe1e59c2e39f62b84d",
+        "REE_ANTPAT_CUTS_DATA.h5": "sha256:e892e6d1d88dab705bc74dafba1f29e29ee3209c1731ed01996c61a5ca14674e",
+        "README.txt": "sha256:af15212d12f55fa6385af8972c68b36b48e1ecac61345731d863a1d2593b68e2",
+        "dem_trunc.tiff": "sha256:0fc4671c855c57da1e12d071d06f5fc115c706da1c852121b2243ba77fcaadbd"
+      }
+    },
+    {
+      "name": "L0B_RRSD_DIST1",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_DIST1",
+      "files": {
+        "REE_L0B_NISAR_DATA_PASS1.h5": "sha256:bedc7417fa828d25855b47b5cf1bae28aad5f266a62baaebc4471289e1ebf829",
+        "REE_ANTPAT_DATA.h5": "sha256:059fc6e18088418fc70b69161d08a7ce96b0dde4d1c3c2c4470b62911b470d98",
+        "README.txt": "sha256:a8336fececf9777ca6d7c8fd363c591711f55d72b969ff6689305c1cc2726761"
+      }
+    },
+    {
+      "name": "L0B_RRSD_DIST2",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_DIST2",
+      "files": {
+        "REE_L0B_NISAR_DATA_PASS2.h5": "sha256:94f915d9d38025af2d7ec3de4606f839cc5519b3a15ebb706a067d671db73da3",
+        "REE_ANTPAT_DATA.h5": "sha256:059fc6e18088418fc70b69161d08a7ce96b0dde4d1c3c2c4470b62911b470d98",
+        "README.txt": "sha256:a8336fececf9777ca6d7c8fd363c591711f55d72b969ff6689305c1cc2726761"
+      }
+    },
+    {
+      "name": "L0B_RRSD_ALPSRP037370690",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_ALPSRP037370690",
+      "files": {
+        "ALPSRP037370690.L0B.h5": "sha256:6136fa5b7ff0c9dc2e4477f595ba9f58f0a305ec509e6efe7af6ac0e5151564c",
+        "README.txt": "sha256:cc098ae0a4f85cec3684fab76afe8b3dc8582f15e2e03af9fa3a532571a2e4fb"
+      }
+    },
+    {
+      "name": "L0B_RRSD_ALPSRP271200680",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_ALPSRP271200680",
+      "files": {
+        "ALPSRP271200680.L0B.h5": "sha256:9da88d3e3ae5e860e5563265ee002228f08fda3d221fb4b7dc9eb1f514128d09",
+        "README.txt": "sha256:f94df0283e348162f2bf12e099eaa4824a9e7fac72c162999b65173c198b04c2"
+      }
+    },
+    {
+      "name": "L0B_RRSD_ALPSRP262866750_Chile",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_ALPSRP262866750_Chile",
+      "files": {
+        "ALPSRP262866750.L0B.h5": "sha256:c9359af20dea53bff78319cb49931126b9aec81fde6aeaa3d4037fd5783ea558",
+        "dem.tif": "sha256:e30e2ae63e88f442c83d42b255682f06b6014f313d012d9b321e3a6622bcd7f6",
+        "README.txt": "sha256:6d19d73b58cc19dff48c2c5885131a87f575bea9189f8eae6eab2d616139add1"
+      }
+    },
+    {
+      "name": "L0B_RRSD_ALPSRP269576750_Chile",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_ALPSRP269576750_Chile",
+      "files": {
+        "ALPSRP269576750.L0B.h5": "sha256:26bd18aaf3211c0628f79b1a7c72dbcaeb27776ccd49676d1f08ee6df0c1dda3",
+        "dem.tif": "sha256:e30e2ae63e88f442c83d42b255682f06b6014f313d012d9b321e3a6622bcd7f6",
+        "README.txt": "sha256:92b34ba852c1e7710dfe48fa2bb9b6ea5fac654a25dc11d8c1237e252bd041fa"
+      }
+    },
+    {
+      "name": "L0B_RRSD_ALPSRP110160680_Rosamond",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_ALPSRP110160680_Rosamond",
+      "files": {
+        "2008-02-18_0620_Rosamond-corner-reflectors.csv": "sha256:56d2d7055b58811c5de17b150c8540c8959ea1470b58b8c4b2b7a6c75def9566",
+        "ALPSRP110160680.L0B.h5": "sha256:6212490d2c429f996c1225a5fb72f0b112e841380970087ac369bf7d9a911535",
+        "dem.tif": "sha256:f329ab16e9ae946f7969a09b141e13d2dbebae8926cc6c25bff97caa028965f8",
+        "ERA5_N34_N36_W119_W117_20080218_06.grb": "sha256:792a82e0e86bd6a32e4585a76f66f864db3f4aeaceb37d750f7df2ef64fb3707",
+        "NISAR_ANCL_TEC_20230124T021043_20080218T062000_20080218T062020_v0.0.json": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "README.txt": "sha256:0efec186c583e1669fd122ccf50dda738ef6dd2ea2508d6f54c91d09ac2d2aa1",
+        "HRES_2008_02_18_T06_20_00_34N_37N_120W_117W.nc": "sha256:15db5c5609fed99cab09c530bcae4e0dc3680ac73a0310e46ad515c0589f9080",
+        "NISAR_ANC_L_TEC_20230421T214743_20080218T061910_20080218T061940_v0.1.json": "sha256:370c60fe9694536c3840f3cbe421409d3ab53f744a61ee1437ca545fe0a4c713",
+        "watermask_rosamond.tif": "sha256:5553f0f6aaffe3be12292e9399187f5c53f1b2b9c596f33ed0ee9fef0a1e1fc3"
+      }
+    },
+    {
+      "name": "L0B_RRSD_ALPSRP116870680_Rosamond",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_ALPSRP116870680_Rosamond",
+      "files": {
+        "2008-04-04_0619_Rosamond-corner-reflectors.csv": "sha256:75703872b64cbec7366462010bf3a759a57f4bda914ea3e78c2c3c44dd44b819",
+        "ALPSRP116870680.L0B.h5": "sha256:d88b12cb19d8495acea22c41a64501ffe9161dd03669027c4e62624c5f9bfea9",
+        "dem.tif": "sha256:f329ab16e9ae946f7969a09b141e13d2dbebae8926cc6c25bff97caa028965f8",
+        "ERA5_N34_N36_W119_W117_20080404_06.grb": "sha256:911c4f2e5935d9de145258a4a10e9d1dfa1686ab020b293b30832ee1e1c0f8e1",
+        "NISAR_ANCL_TEC_20230124T021043_20080404T061910_20080404T061940_v0.0.json": "sha256:76948f45b98bd29139950a14c4fd1873fd4c21f2d40a8f8abdfe7bfd0bc5a59c",
+        "README.txt": "sha256:42ea8c16661c1437be23d7c3898936787170478e6b80eefa49d20eae30f53ab5",
+        "HRES_2008_04_04_T06_19_17_34N_37N_120W_117W.nc": "sha256:4da30bb11b1f1d64cd6e8212da80533087e1ec42bb91f148676a4f0cdfaa2b25",
+        "NISAR_ANC_L_TEC_20230124T021043_20080404T061910_20080404T061940_v0.2.json": "sha256:76948f45b98bd29139950a14c4fd1873fd4c21f2d40a8f8abdfe7bfd0bc5a59c",
+        "watermask_rosamond.tif": "sha256:5553f0f6aaffe3be12292e9399187f5c53f1b2b9c596f33ed0ee9fef0a1e1fc3"
+      }
+    },
+    {
+      "name": "L0B_RRSD_ALPSRP264757150_Amazon",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_ALPSRP264757150_Amazon",
+      "files": {
+        "ALOS1_PALSAR_ANTPAT_BEAM343.h5": "sha256:336771ba1d56f5256328ed069ef8e64f42b3e4b0da32f0a9bc81ab5a4e4d2f8e",
+        "ALPSRP264757150-H1.0__A.h5": "sha256:216c815d850602da8a09844a258ba4781ca7fb332949ae8985efc0da6a97faed",
+        "README.txt": "sha256:8e50d890de4b69a05f4db4760f2d58f59947dc31eccb6376407e3688f807be52"
+      }
+    },
+    {
+      "name": "L0B_RRSD_REE_NISAR_dithered",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_REE_NISAR_dithered",
+      "files": {
+        "L0B_RRSD_REE_NISAR_dithered.h5": "sha256:32c057a06b9fc7602d3e86c92bac30c814943c78a144543a775720d8a9836d17",
+        "REE_ANTPAT_DATA.h5": "sha256:5af8c532d47de70d6f56abcd856ea72143c8edd485f33ea51d7190c799426408",
+        "README.txt": "sha256:7ff13e3bed3f552a1628df21e0eab420136144a5a51ab8ffaa2ce41e724e346e"
+      }
+    },
+    {
+      "name": "L0B_RRSD_REE_BF_NET",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_REE_BF_NET",
+      "files": {
+        "NISAR_L0_PR_RRSD_016_095_A_152S_20210701T000000_20210701T000000_A00001_F_P_J_001.h5": "sha256:016627387048fa1cb362ab90f5540a31b2d0b6d75f0f2d7915c795775caf07b3",
+        "README.txt": "sha256:18643d20d40935f702c3e8cc30b7cef6864f53e2ab60b5a352296d6b807e1bf6"
+      }
+    },
+    {
+      "name": "L0B_RRSD_REE_CHANNEL4_EXTSCENE_PASS1",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_REE_CHANNEL4_EXTSCENE_PASS1",
+      "files": {
+        "README.txt": "sha256:8360ae913409f5d99c6e0de3e83abdaa7a8cef546202dfab258b317cc8e5a233",
+        "REE_ANTPAT_CUTS_BEAM4.h5": "sha256:10213e1bffbe7ed1a5206b2f3796a39a40ad89f25e39e2eba9914bd0c1213448",
+        "REE_ATTITUDE_CHANNEL4_EXTSCENE_PASS1.xml": "sha256:1898e77f02fd0ed11cd4999f72b104bcfa3f49e12182729ac9c034b14400b6fd",
+        "REE_L0B_CHANNEL4_EXTSCENE_PASS1_LINE3000.h5": "sha256:574ef52975ed45bc03f219ec426c8f52391006e2812f4d1b6668b48455759ac2",
+        "REE_L0B_CHANNEL4_EXTSCENE_PASS1_LINE3000_CALIB.h5": "sha256:4a4125342d88a8edf9e0949c76f4cba9905999afd99aca231cb845ea19d10a5c",
+        "REE_L0B_CHANNEL4_EXTSCENE_PASS1_LINE3000_UNCALIB.h5": "sha256:4212a401ec922ba4e593250929b68394113517e3b68c10d2976cea236c7779ef",
+        "REE_ORBIT_CHANNEL4_EXTSCENE_PASS1.xml": "sha256:5a158f69eaa933fdae7026b9bbe8b11a156b5811c5742b6035210c49a417cf6a"
+      }
+    },
+    {
+      "name": "L0B_RRSD_DM2_REE_AMAZON_PASS1",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_DM2_REE_AMAZON_PASS1",
+      "files": {
+        "README.txt": "sha256:b72a33cd14f57f38971130f1a249aecadea384e9ad8d46e754d25d65c1bb8a4d",
+        "NISAR_ANTPAT_20221222T161043.h5": "sha256:87c5a5515d0757bfb38429e38ad8d34e7b3cb0dd5ddb52853eb2ffb5902ed87b",
+        "NISAR_L0_PR_RRSD_001_014_A_033S_20220102T101135_20220102T101137_A00001_F_P_J_001.h5": "sha256:6256ec27ef9af72e7f83395d81560987cfe44bd2546bf5f8a92eac87567383bf",
+        "REE_DEM_AMAZON_PASS1.tif": "sha256:eb4afb4e56f30d7dee56eae33d6dd6e31e44cd2305c1233145601cf064b46714"
+      }
+    },
+    {
+      "name": "L1_RSLC_REE_PTA",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_REE_PTA",
+      "files": {
+        "NISAR_L1_PR_RSLC_016_158_A_003_2000_SHNA_A_20210701T032003_20210701T032003_A00000_F_P_J_001.h5": "sha256:ec259cf888326267cfac7a06ef832a3c516abbf5c73a379e15eefe90ec95fc66",
+        "README.txt": "sha256:fadb96c02d8b51567c45b7162dff88827dd9826329b9fdf60e845b2922cb1a19"
+      }
+    },
+    {
+      "name": "L1_RSLC_S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F",
+      "files": {
+        "S1B_IW_SLC__1SDV_20180504T104507_20180504T104535_010770_013AEE_919F.h5": "sha256:0ebc8d001d37ff1ddeb62c9bd351fd7fd36fa62fa11eff7206e7b28a4729a4f7",
+        "README.txt": "sha256:d488697dc07879a1018ef898acdabc6ec81c9196caa71220bbf3e8a1a1a573f9",
+        "EPSG32718.vrt": "sha256:07c216962565634a148c77e0d0d2a30824c5009d4897351fcd1e79f388827c56",
+        "N9000E0000.tif": "sha256:bc6f054a18141bcbbfbd993fa7172516817e86e567436bca022547468e38ebad",
+        "N9000E0200.tif": "sha256:948a276b8beea9de8ee408162c1dac514f17e2bd0db86211fc21eab36b30b14e",
+        "N9000E0400.tif": "sha256:13070eaac33ac832dc0a6b01a45bc5a250273870e5e3fe76c3ea2da62f5ab734",
+        "N9200E0000.tif": "sha256:23de23be68f1895dd7df038b93de6bfd505388cb1f29a7d1b6acbbd2b8464f40",
+        "N9200E0200.tif": "sha256:00cf9956a44679b68a3e78cdd4fe3383758f9f79059e20a75fd238692e8efd0d",
+        "N9200E0400.tif": "sha256:f81f981964373461db89ff7a95600ae6cca794ec95199865c489561f1628192a",
+        "N9400E0000.tif": "sha256:f15684f1a835782ac3176e9fde6f67a045af37547037514bf1cbd67d383f2b1e",
+        "N9400E0200.tif": "sha256:1bf015e3df082a366a9bba2e1cb42a9c2d503013ec1eabee77a3c2e36728106f",
+        "N9400E0400.tif": "sha256:cdf35b10334615c3778e182ff99af3a6af60072e322353021a4164700c5c3b7e"
+      }
+    },
+    {
+      "name": "L1_RSLC_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05",
+      "files": {
+        "SanAnd_05024_18038_006_180730_L090_CX_129_05.h5": "sha256:00f1711dfa5144f67dcd4ebd644d8a267d905e20fd9c0d83a5e65cf76902be45",
+        "README.txt": "sha256:bdd96da0ca90f0a22b21f42c816b4d7807943aeca1b4ced766015dca96a28e92",
+        "EPSG32610.vrt": "sha256:876d7401acc4b3fe4fd7ddb48512037785cf3f7b3cd08a09e2bfa06f7e5868af",
+        "N4000E0400.tif": "sha256:aeea44f962b1ddf06034a0f1c7db39c9040ede5ab162bb7574269e804159b1f0",
+        "N4000E0600.tif": "sha256:4e56cbcd3ce61e571107b2f516fd59646e58daea742237c16f178d797572f768"
+      }
+    },
+    {
+      "name": "L1_RSLC_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_SanAnd_05518_12018_000_120419_L090_CX_143_03",
+      "files": {
+        "SanAnd_05518_12018_000_120419_L090_CX_143_03.h5": "sha256:b20bdb6807845b8adabd0485d17d8ed51fb081f2a49875ef32e36ff1d47f1a5d",
+        "dem.tif": "sha256:941dac726c8fe97395abb3d7f297e4661c375edd6e999a02bbdf5eeb1afad75d",
+        "ERA5_N38_N40_W124_W121_20120419_16.grb": "sha256:25ad0d755789d6477251395339df27333fb22586b3aaacc81781866998e1e691",
+        "README.txt": "sha256:731bb809c4c3ba1a2364deca6c0a666c6b26ce9a1ce8f1ed34ca5f63a252789e",
+        "HRES_2012_04_19_T16_37_23_38N_41N_125W_122W.nc": "sha256:e015f3302da75b08df7dc963c5799c00bbb670d0c8cec10a51ab9793534ff2e4"
+      }
+    },
+    {
+      "name": "L1_RSLC_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_138_02",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_138_02",
+      "files": {
+        "SanAnd_05518_12128_008_121105_L090_CX_138_02.h5": "sha256:5b30ee7c927753d7df400a363e15f569a7f21e3543d1bf0e21947a5396e4cf15",
+        "dem.tiff": "sha256:e9bad42c09f6529836e60af01f141d2217b5eac0c19c6663683e29649c29fdd2",
+        "README.txt": "sha256:d4c5b08adf71c1aae4638d0d2808eea4509ed27a6631297631d99dfd9413472c"
+      }
+    },
+    {
+      "name": "L1_RSLC_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_SanAnd_05518_12128_008_121105_L090_CX_143_02",
+      "files": {
+        "SanAnd_05518_12128_008_121105_L090_CX_143_02.h5": "sha256:3f16f1e9810401257d49faba1a7b4209c086fe3db31d06fc5c9ba19c0a349927",
+        "dem.tif": "sha256:941dac726c8fe97395abb3d7f297e4661c375edd6e999a02bbdf5eeb1afad75d",
+        "ERA5_N38_N40_W124_W121_20121105_22.grb": "sha256:b43c123c25a99806a1607fd2c7e0d06008e4f947a2e3a0ea038c9121e3c08939",
+        "README.txt": "sha256:731bb809c4c3ba1a2364deca6c0a666c6b26ce9a1ce8f1ed34ca5f63a252789e",
+        "HRES_2012_11_05_T22_48_18_38N_41N_125W_122W.nc": "sha256:e41edc7c703a380c0d85273fe9963ccf59a750d8c83d16521a9c8385233c286e"
+      }
+    },
+    {
+      "name": "L1_RSLC_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_03",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_NISARP_32039_19049_005_190717_L090_CX_129_03",
+      "files": {
+        "NISARP_32039_19049_005_190717_L090_CX_129_03.h5": "sha256:ea37d596a44a7027c22a009b8c7218d103e0a6a77764aad30768982cd2e7b1ee",
+        "README.txt": "sha256:f3b1c8ac5563831514f0c1dfb87247cc6848511f8f9e3cfaeba1cc2bedba91c3",
+        "EPSG32617.vrt": "sha256:800e7161cf932e5e6ac773f28731377b8948af13dbc10ffedb631f48f99424b4",
+        "N3800E0200.tif": "sha256:c6613d6a03d5ad6819cbf718f8a2ca7a857ea386455560aa755ce6cf409c6835"
+      }
+    },
+    {
+      "name": "L1_RSLC_UAVSAR_NISARP_32039_19052_004_190726_L090_CX_129_02",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_NISARP_32039_19052_004_190726_L090_CX_129_02",
+      "files": {
+        "NISARP_32039_19052_004_190726_L090_CX_129_02.h5": "sha256:062c84bff1bc024b4b22d3332a66ada00a9b58694c67aa971cf6fa8c9f02d3bf",
+        "README.txt": "sha256:103ee7f5e31e6c25ff4545e71360309590bd2d31318b6461da2034177055a898",
+        "EPSG32617.vrt": "sha256:800e7161cf932e5e6ac773f28731377b8948af13dbc10ffedb631f48f99424b4",
+        "N3800E0200.tif": "sha256:c6613d6a03d5ad6819cbf718f8a2ca7a857ea386455560aa755ce6cf409c6835"
+      }
+    },
+    {
+      "name": "L1_RSLC_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02",
+      "files": {
+        "Snjoaq_14511_18034_014_180720_L090_CX_143_02.h5": "sha256:371bab3ecdf82a5a2c166e40b3340fd10393eb334df5a0e09ebd6378fe3c54be",
+        "dem.tif": "sha256:620a2107d233e1372327e8493029ed8e3a58d6e2a0a1256c83ac0bdcb5d55ba8",
+        "README.txt": "sha256:db994b22856631b56db14880ecca7c979a879554cbeb3220163519536fe85cf2"
+      }
+    },
+    {
+      "name": "L1_RSLC_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02",
+      "files": {
+        "Snjoaq_14511_18044_015_180814_L090_CX_143_02.h5": "sha256:f45a54738fa4ec3101c298bb6f38dc6df60ae1afa478fea31b8e5acfa47b309c",
+        "dem.tif": "sha256:620a2107d233e1372327e8493029ed8e3a58d6e2a0a1256c83ac0bdcb5d55ba8",
+        "README.txt": "sha256:db994b22856631b56db14880ecca7c979a879554cbeb3220163519536fe85cf2"
+      }
+    },
+    {
+      "name": "L2_GCOV_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001",
+      "tags": [],
+      "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L2_GCOV_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001",
+      "files": {
+        "WldCvr_cbmap221204.txt": "sha256:49756ec76086b62354d54a654c7bf101469634e8c501d0ef38c141aa40e2c1c6",
+        "ni_cube_30_50_220828v2.h5": "sha256:4c3ec4216b0d317ea589a5a347f7806e71d7a02ff6c5073403e11adb7a0188af",
+        "vwc_M01_288_200m.h5": "sha256:bee532ff2810bf0459cc1118a7f7a718673cdb3aae83f32eb49d2891ac3d89c5",
+        "vwc_M01_276_200m.h5": "sha256:d1df4c6c47b535e056cc4f29a22a789f99a3b5201519c563342f6a2b7e3b147a",
+        "vwc_M01_264_200m.h5": "sha256:36f653f9daa760110141c8c57ab8092f166410826fc0b80ea78297ba3bd2c7dd",
+        "eps2mvMironov_002.float32": "sha256:690ef0e9c3215b7a1d536896b84e5a120c0e5fc256f22110de8e804dbb028e4d",
+        "alphatable.nc": "sha256:202b77b89d71ee55da90d13ea30fde8d44ae62ab6e4d4e730441d32ed238589d",
+        "A4S10040600100700001.nc": "sha256:c6d6951afb98ce6297c3f034c789521a8593c4a32f3e596bc6222f9fff1ff1ec",
+        "sm_static_ancillary.h5": "sha256:0feb5393860b8f8a367ae1d5fa492d38721c313008ec29ff013fc59071d1fbac",
+        "NISAR_L2_PR_GCOV_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001.h5": "sha256:2046b4f9c394f8a29c1c9ba5753e2a3107f2b88ecea9c0b57a93f36ed42b6c01",
+        "NISAR_L2_PR_GCOV_022_045_A_017_4020_HH_20220914T135152_20220914T135219_P01101_P_P_J_001.h5": "sha256:370d9b7cc45c51b743660be7a8f6d646dd20377002ff74cc7923b31248aaada3",
+        "NISAR_L2_PR_GCOV_021_045_A_017_4020_HH_20220902T135152_20220902T135219_P01101_P_P_J_001.h5": "sha256:50d242e396b8a6f7cb5494548b9dccabd83e0e84ab046c7a6a9600ce74308b35",
+        "README.txt": "sha256:fd1208b0e436053babb1c168593f6442b07d976f1a5b3b6a2ace62b1c9745cb4",
+        "SMAPC_Alpha0_Uncertainty_HH.bin": "sha256:f0dcb602f661286acd463e35b7bd8a506c6d4e377d4620588664f836255039ec",
+        "SMAPC_Alpha0_Uncertainty_VV.bin": "sha256:4c83e77a741dada7386658714c6ccb8789ea9df57065a4e50d41f71fc58dff8c",
+        "SMAP_L3_E_17000_nf_average_09_1.dat": "sha256:ae559830637c3d980968a2aace170e6092c760d257831984e39c819c28e24531",
+        "SMAP_L3_E_17000_nf_average_year.dat": "sha256:4ac2b34bd39241fca60420dc5c4d22309f91ac6fba1ee8501370e9969f16a26e",
+        "SMAP_L3_E_17000_nf_max_09_1.dat": "sha256:6313d4a2f7c67cf0f7dd35b9c1bd1cb6e0809b1ce772940385b992a1c80e1e54",
+        "SMAP_L3_E_17000_nf_max_year.dat": "sha256:0ececbfea8c16d1ebf2508bdecdfc438a0abd67023820a3812460f11912aa4d6",
+        "SMAP_L3_E_17000_nf_min_09_1.dat": "sha256:d3c3f3be2610546814dadffc96f1ccee0250ece8c8b65b4ed5210a2e1a81b0d7",
+        "SMAP_L3_E_17000_nf_min_year.dat": "sha256:a4ef9b34286caf8fd0f77244a1f552628f59a960e4ae3f0cbebe2dd4810927f6"
+      }
+    }
+  ]
+}
