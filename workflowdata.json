@@ -14,7 +14,7 @@
     },
     {
       "name": "L0B_RRSD_REE2",
-      "tags": [],
+      "tags": ["rslc", "REE2"],
       "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L0B_RRSD_REE2",
       "files": {
         "attitude.xml": "sha256:cf9e85221ff0cfd0da5e09f88454887106e93ee2f04204792d0f197a997d178e",
@@ -269,7 +269,7 @@
     },
     {
       "name": "L1_RSLC_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02",
-      "tags": [],
+      "tags": ["filetest"],
       "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_Snjoaq_14511_18034_014_180720_L090_CX_143_02",
       "files": {
         "Snjoaq_14511_18034_014_180720_L090_CX_143_02.h5": "sha256:371bab3ecdf82a5a2c166e40b3340fd10393eb334df5a0e09ebd6378fe3c54be",
@@ -279,7 +279,7 @@
     },
     {
       "name": "L1_RSLC_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02",
-      "tags": [],
+      "tags": ["filetest"],
       "url": "https://cae-artifactory.jpl.nasa.gov/artifactory/general-develop/gov/nasa/jpl/nisar/adt/data/L1_RSLC_UAVSAR_Snjoaq_14511_18044_015_180814_L090_CX_143_02",
       "files": {
         "Snjoaq_14511_18044_015_180814_L090_CX_143_02.h5": "sha256:f45a54738fa4ec3101c298bb6f38dc6df60ae1afa478fea31b8e5acfa47b309c",

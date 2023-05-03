@@ -3,7 +3,7 @@ import os
 import threading
 from pathlib import Path
 from subprocess import DEVNULL, PIPE, list2cmdline, run
-from typing import Dict, Iterable, List, Union
+from typing import Dict, Iterable, List
 
 from ._bind_mount import BindMount
 from ._image import Image
@@ -11,7 +11,7 @@ from ._search import filtered_file_search, names_only_search, search_file
 
 
 def data_search(
-    file: Union[os.PathLike[str], str],
+    file: os.PathLike[str] | str,
     tags: Iterable[Iterable[str]],
     names: Iterable[str],
     fields: Iterable[str],
@@ -38,7 +38,7 @@ def data_search(
 
     Returns
     -------
-    List[Dict[str, Union[str, Dict[str, str]]]]
+    List[Dict[str, str | Dict[str, str]]]
         The items returned by the query, in dictionary format.
     """
     if all:
@@ -59,7 +59,7 @@ def data_search(
 
 
 def data_names(
-    file: Union[os.PathLike[str], str],
+    file: os.PathLike[str] | str,
     tags: Iterable[Iterable[str]],
     names: Iterable[str],
     all: bool = False,
@@ -93,10 +93,10 @@ def data_names(
 
 
 def data_fetch(
-    file: Union[os.PathLike[str], str],
+    file: os.PathLike[str] | str,
     tags: Iterable[Iterable[str]],
     names: Iterable[str],
-    mount: Union[os.PathLike[str], str],
+    mount: os.PathLike[str] | str,
     all: bool = False,
     no_cache: bool = False,
     verbose_stderr: bool = False,
@@ -172,7 +172,7 @@ def _request_data_item(
 
     Parameters
     ----------
-    data_item : Dict[str, Union[str, Dict[str, str]]]
+    data_item : Dict[str, str | Dict[str, str]]
         A dictionary description of a data repository.
     rover_image : Image
         A Docker image with the Rover program.

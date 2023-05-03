@@ -1,7 +1,7 @@
 {
   "rslc": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "rslc_REE1": {
         "runconfig": "rslc_REE1.yaml",
         "inputs": "L0B_RRSD_REE1"
@@ -41,7 +41,7 @@
 
   "doppler": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "doppler_ALPSRP264757150_Amazon": {
         "runconfig": "doppler_ALPSRP264757150_Amazon.txt",
         "inputs": "L0B_RRSD_ALPSRP264757150_Amazon"
@@ -56,7 +56,7 @@
 
   "el_edge": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "el_edge_ALPSRP264757150_Amazon": {
         "runconfig": "el_edge_ALPSRP264757150_Amazon.txt",
         "inputs": "L0B_RRSD_ALPSRP264757150_Amazon"
@@ -66,7 +66,7 @@
 
   "el_null": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "el_null_REE_CHANNEL4_EXTSCENE_PASS1": {
         "runconfig": "el_null_REE_CHANNEL4_EXTSCENE_PASS1.txt",
         "inputs": "L0B_RRSD_REE_CHANNEL4_EXTSCENE_PASS1"
@@ -81,7 +81,7 @@
 
   "gslc": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "gslc_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05": {
         "runconfig": "gslc_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05.yaml",
         "inputs": "L1_RSLC_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05"
@@ -121,7 +121,7 @@
 
   "gcov": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "gcov_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05": {
         "runconfig": "gcov_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05.yaml",
         "inputs": "L1_RSLC_UAVSAR_SanAnd_05024_18038_006_180730_L090_CX_129_05"
@@ -161,7 +161,7 @@
 
   "noisest": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "noisest_REE_BF_NET": {
         "runconfig": "noisest_REE_BF_NET.txt",
         "inputs": "L0B_RRSD_REE_BF_NET"
@@ -171,7 +171,7 @@
 
   "pta": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "pta_REE_PTA": {
         "runconfig": "pta_REE_PTA.txt",
         "inputs": "L1_RSLC_REE_PTA"
@@ -181,7 +181,7 @@
 
   "soilm": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "soilm_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001": {
         "runconfig": "soilm_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001.txt",
         "inputs": "L2_GCOV_023_045_A_017_4020_HH_20220926T135152_20220926T135219_P01101_P_P_J_001"
@@ -191,7 +191,7 @@
 
   "insar": {
     "type": "singletest",
-    "subtests": {
+    "tests": {
       "insar_UAVSAR_NISARP_32039_19049-005_19052-004_129": {
         "runconfig": "insar_UAVSAR_NISARP_32039_19049-005_19052-004_129.yaml",
         "inputs": {
@@ -220,7 +220,7 @@
 
   "end2end": {
     "type": "multitest",
-    "subtests": {
+    "tests": {
       "end2end_pair_ALPSRP262866750_ALPSRP269576750_Chile": {
         "inputs": {
           "ref": "L0B_RRSD_ALPSRP262866750_Chile",

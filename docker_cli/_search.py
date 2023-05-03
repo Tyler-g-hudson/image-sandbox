@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import fnmatch
 import json
 import os
 import re
-from typing import Dict, Iterable, List, Optional, Union
+from typing import Dict, Iterable, List, Optional
 
 
 def names_only_search(
@@ -33,7 +35,7 @@ def names_only_search(
     List[str]
         The "name" fields of all accepted items.
     """
-    items: List[Dict[str, Union[str, Dict[str, str]]]] = search_file(
+    items: List[Dict[str, str | Dict[str, str]]] = search_file(
         tags=tags, names=names, filename=filename, all=all
     )
     name_list: List[str] = []
@@ -72,13 +74,13 @@ def filtered_file_search(
 
     Returns
     -------
-    List[Dict[str, Union[str, List[str]]]]
+    List[Dict[str, str or List[str]]]
         The list of items accepted by the search, with filtered tags.
     """
-    items: List[Dict[str, Union[str, Dict[str, str]]]] = search_file(
+    items: List[Dict[str, str | Dict[str, str]]] = search_file(
         tags=tags, names=names, filename=filename, all=all
     )
-    return_items: List[Dict[str, Union[str, Dict[str, str]]]] = []
+    return_items: List[Dict[str, str | Dict[str, str]]] = []
     for item in items:
         # The item is a dict. Get all of the desired fields from it.
         new_item = {}
@@ -118,13 +120,13 @@ def search_file(
 
     Returns
     -------
-    List[Dict[str, Union[str, List[str]]]]
+    List[Dict[str, str or List[str]]]
         The list of items accepted by the search.
     """
     with open(file=filename) as file:
         json_dict = json.load(file)
 
-    data: List[Dict[str, Union[str, Dict[str, str]]]] = json_dict["data"]
+    data: List[Dict[str, str | Dict[str, str]]] = json_dict["data"]
     if all:
         return data
     items: List[Dict[str, Union[str, Dict[str, str]]]] = list(
@@ -134,7 +136,7 @@ def search_file(
 
 
 def _accept_item(
-    item_dict: Dict[str, Union[str, Dict[str, str]]],
+    item_dict: Dict[str, str | Dict[str, str]],
     tags: Iterable[Optional[Iterable[str]]],
     names: Iterable[Optional[str]],
 ) -> bool:
