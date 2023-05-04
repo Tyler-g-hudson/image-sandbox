@@ -162,7 +162,7 @@ def data_fetch(
 
 
 def _request_data_item(
-    data_item: Dict[str, Union[str, Dict[str, str]]],
+    data_item: Dict[str, str | Dict[str, str]],
     mount_point: BindMount,
     no_cache: bool,
     verbose_stderr: bool,

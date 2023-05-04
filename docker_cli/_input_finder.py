@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-import json
 import os
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 
 def get_input_files_for_test(
-    workflow_name: str,
-    test_name: str,
-    input_dirs: Sequence[str],
+    test_info: Mapping[str, str | Sequence[str] | Mapping[str, str]],
     cache_dirs: Sequence[str],
-    file: str = "workflowtests.json"
+    input_dirs: Optional[Sequence[str]] = None
 ) -> Dict[str, os.PathLike[str] | str]:
     """
     Associates the input repositories needed by a given test with their locations.
@@ -21,7 +18,7 @@ def get_input_files_for_test(
         The name of the workflow for the test.
     test_name : str
         The name of the test.
-    input_dirs : Sequence[str]
+    input_dirs : Sequence[str], optional
         The list of input directories in [PATH] or [LABEL]:[PATH] format.
     cache_dirs : Sequence[str]
         The list of cache directories.
@@ -31,28 +28,14 @@ def get_input_files_for_test(
     Returns
     -------
     Dict[str, str]
-        A dictionary in {input_repository:path} format.
+        A dictionary in {input_repository:host_path} format.
     """
-    labels_to_dirs = input_dict_parse(input_dirs)
-
-    print("LABELS_TO_DIRS:")
-    print(json.dumps(input_dirs, indent=2))
-
-    test_info = get_test(
-        workflow_name=workflow_name,
-        test_name=test_name,
-        filename=file
-    )
-
-    print("\nTEST_INFO:")
-    print(json.dumps(test_info, indent=2))
+    if input_dirs is not None:
+        labels_to_dirs = input_dict_parse(input_dirs)
+    else:
+        labels_to_dirs = {}
 
     req_repos, label_repo_dict = generate_search_tables(test_info)
-
-    print("\nREQUIRED_REPOSITORIES:")
-    print(json.dumps(req_repos, indent=2))
-    print("\nLABEL_REPO_DICT:")
-    print(json.dumps(label_repo_dict, indent=2))
 
     inputs_to_paths = search_for_inputs(
         required_repositories=req_repos,
@@ -60,9 +43,6 @@ def get_input_files_for_test(
         cache_dirs=cache_dirs,
         input_dirs=labels_to_dirs
     )
-
-    print("\nINPUTS_TO_PATHS:")
-    print(json.dumps(inputs_to_paths, indent=2))
 
     return inputs_to_paths
 
@@ -218,36 +198,8 @@ def _in_cache(
     return os.path.isdir(expected_dir)
 
 
-def get_test(
-    workflow_name: str,
-    test_name: str,
-    filename: str = "workflowtests.json"
-) -> Dict[str, str | List[str] | Dict[str, str]]:
-    """
-    Get test data from the given file.
-
-    Parameters
-    ----------
-    workflow_name : str
-        The name of the workflow in the test file.
-    test_name : str
-        The name of the test under the given workflow.
-    file : str, optional
-        The name of the test. Defaults to "workflowtests.json".
-
-    Returns
-    -------
-    Dict[str, str | List[str] | Dict[str, str]]
-        A dictionary representing information about the test.
-    """
-    with open(filename) as file:
-        file_dict = json.load(fp=file)
-    workflow_dict = file_dict[workflow_name]
-    return workflow_dict["tests"][test_name]
-
-
 def generate_search_tables(
-    test_dict: Mapping[str, str | List[str] | Mapping[str, str]]
+    test_dict: Mapping[str, str | Sequence[str] | Mapping[str, str]]
 ) -> Tuple[List[str], Dict[str, str]]:
     """
     Generates the search tables for the given test information.
@@ -363,10 +315,3 @@ def check_input_kvp(kvp_str: str) -> Tuple[str, os.PathLike[str] | str]:
     # If only one string is returned, then the key and value are the same.
     else:
         return kvp[0], kvp[0]
-
-
-this_test = get_input_files_for_test(
-    "insar", "insar_UAVSAR_Snjoaq_14511_18034-014_18044-015_143",
-    input_dirs=["ref:./test"],
-    cache_dirs=["./mnt"]
-)

@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import os
 import re
+import shutil
+import tempfile
 from pathlib import Path
 from shlex import split
 from subprocess import DEVNULL, PIPE, run
 from textwrap import dedent
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Optional, Sequence
 
 from ._bind_mount import BindMount
 from ._docker_cmake import (
