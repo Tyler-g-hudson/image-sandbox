@@ -22,9 +22,14 @@ from ._image import Image
 from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
 
 
-def clone(tag: str, base: str, repo: str, branch: str):
+def clone(
+    tag: str,
+    base: str,
+    repo: str,
+    branch: str = ""
+):
     """
-    Builds a docker image containing the requested GitHub repository.
+    Builds a docker image containing the requested Git repository.
 
     .. note:
         With this image, the workdir is moved to the github repo's root directory.
@@ -36,9 +41,9 @@ def clone(tag: str, base: str, repo: str, branch: str):
     base : str
         The base image tag.
     repo : str
-        The name of the GitHub repo (in [USER]/[REPO_NAME] format)
+        The name of the Git repo (in [USER]/[REPO_NAME] format)
     branch : str
-        The name of the branch to be checked out.
+        The branch of the Git repo. Defaults to "".
 
     Returns
     -------
@@ -161,11 +166,16 @@ def install(tag: str, base: str) -> Image:
     return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
 
 
-def build_all(
-    tag: str, base: str, repo: str, branch: str, build_type: str, no_cuda: bool
+def full_compile(
+    tag: str,
+    base: str,
+    repo: str,
+    build_type: str,
+    no_cuda: bool,
+    branch: str = ""
 ) -> Dict[str, Image]:
     """
-    Fully compiles and builds a GitHub repo with cmake.
+    Fully compiles and builds a Git repo with cmake.
 
     Parameters
     ----------
@@ -174,13 +184,13 @@ def build_all(
     base : str
         The base image tag.
     repo : str
-        The name of the GitHub repo, in [USER]/[REPO_NAME] format
-    branch : str
-        The branch of the GitHub repo
+        The name of the Git repo, in [USER]/[REPO_NAME] format
     build_type : str
         The CMAKE build type
     no_cuda : bool
         If True, build without CUDA.
+    branch : str
+        The branch of the Git repo. Defaults to "".
 
     Returns
     -------
