@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import os
+import re
 from pathlib import Path
 from shlex import split
 from subprocess import DEVNULL, PIPE, run
-from typing import Dict, Iterable, List, Union
+from typing import Dict, Iterable, List
 
 from ._bind_mount import BindMount
 from ._docker_cmake import (
@@ -13,7 +16,7 @@ from ._docker_cmake import (
     install_prefix,
 )
 from ._docker_distrib import distrib_dockerfile
-from ._docker_github import github_checkout_dockerfile
+from ._docker_git import git_clone_dockerfile
 from ._docker_mamba import mamba_lockfile_command
 from ._image import Image
 from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
@@ -42,7 +45,23 @@ def clone(tag: str, base: str, repo: str, branch: str):
     Image
         The generated image.
     """
-    body: str = github_checkout_dockerfile(github_repo=repo, repo_branch=branch)
+
+    # Check that the repo pattern matches the given repo string.
+    github_repo_pattern = re.compile(
+        pattern=r"^(?P<user>[a-zA-Z0-9-]+)\/(?P<repo>[a-zA-Z0-9-]+)$", flags=re.I
+    )
+    github_repo_match = re.match(github_repo_pattern, repo)
+    if not github_repo_match:
+        raise ValueError(
+            f"Malformed GitHub repo name: {repo} - "
+            "Please use form [USER]/[REPO_NAME]."
+        )
+    match_dict = github_repo_match.groupdict()
+    repo_name = match_dict["repo"]
+
+    body: str = git_clone_dockerfile(
+        git_repo=repo, repo_branch=branch, repo_name=repo_name
+    )
 
     dockerfile = f"FROM {base}\n\n{body}"
 
@@ -51,7 +70,7 @@ def clone(tag: str, base: str, repo: str, branch: str):
     return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
 
 
-def configure(tag: str, base: str, build_type: str) -> Image:
+def configure(tag: str, base: str, build_type: str, no_cuda: bool) -> Image:
     """
     Produces an image with CMAKE configured.
 
@@ -63,13 +82,15 @@ def configure(tag: str, base: str, build_type: str) -> Image:
         The base image tag.
     build_type : str
         The type of CMAKE build.
+    no_cuda : bool
+        If True, build without CUDA.
 
     Returns
     -------
     Image
         The generated image.
     """
-    body: str = cmake_config_dockerfile(build_type=build_type)
+    body: str = cmake_config_dockerfile(build_type=build_type, with_cuda=not no_cuda)
 
     dockerfile = f"FROM {base}\n\n{body}"
 
@@ -141,7 +162,7 @@ def install(tag: str, base: str) -> Image:
 
 
 def build_all(
-    tag: str, base: str, repo: str, branch: str, build_type: str
+    tag: str, base: str, repo: str, branch: str, build_type: str, no_cuda: bool
 ) -> Dict[str, Image]:
     """
     Fully compiles and builds a GitHub repo with cmake.
@@ -158,6 +179,8 @@ def build_all(
         The branch of the GitHub repo
     build_type : str
         The CMAKE build type
+    no_cuda : bool
+        If True, build without CUDA.
 
     Returns
     -------
@@ -174,7 +197,7 @@ def build_all(
 
     configure_tag = f"{prefix}-{tag}-configured"
     configure_image = configure(
-        tag=configure_tag, base=git_repo_tag, build_type=build_type
+        tag=configure_tag, base=git_repo_tag, build_type=build_type, no_cuda=no_cuda
     )
     images[configure_tag] = configure_image
 
@@ -207,10 +230,22 @@ def distributable(tag: str, base: str, source_tag: str) -> Image:
     Image
         The generated image.
     """
+    base_image: Image = Image(base)
+
+    is_64_bit = test_image(image=base_image, expression='"$BUILD_PREFIX/lib64"')
+
+    if is_64_bit:
+        lib = "lib64"
+    else:
+        lib = "lib"
+
+    dockerfile: str = cmake_install_dockerfile(ld_lib=lib)
+
     header, body = distrib_dockerfile(
         source_tag=source_tag,
         source_path=install_prefix(),
         distrib_path=install_prefix(),
+        ld_lib=lib,
     )
 
     dockerfile = f"{header}\n\nFROM {base}\n\n{body}"
@@ -220,7 +255,7 @@ def distributable(tag: str, base: str, source_tag: str) -> Image:
 
 def test(
     tag: str,
-    logfile: Union[os.PathLike[str], str],
+    logfile: os.PathLike[str] | str,
     compress_output: bool,
     quiet_fail: bool,
 ) -> None:
@@ -231,7 +266,7 @@ def test(
     ----------
     tag : str
         The tag of the image to test.
-    logfile : Union[os.PathLike[str], str]
+    logfile : os.PathLike[str] | str
         The name of the XML test output file.
     compress_output : bool
         If True, compress the output of the test.
@@ -262,14 +297,14 @@ def test(
     host_vol_abspath = Path(host_volume_path).resolve()
     host_vol_abspath.parent.mkdir(parents=True, exist_ok=True)
 
-    mount = BindMount(
+    bind_mount = BindMount(
         src=image_volume_path,
         dst=host_vol_abspath,
         permissions="rw",
     )
 
     command = " ".join(cmd)
-    image.run(command=command, host_user=True, mounts=[mount])
+    image.run(command=command, host_user=True, bind_mounts=[bind_mount])
 
 
 def dropin(tag: str) -> None:
@@ -344,7 +379,7 @@ def remove(
 
 
 def make_lockfile(
-    tag: str, file: Union[str, os.PathLike[str]], env_name: str = "base"
+    tag: str, file: os.PathLike[str] | str, env_name: str = "base"
 ) -> None:
     """
     Makes a lockfile from an image.
@@ -355,8 +390,8 @@ def make_lockfile(
     Parameters
     ----------
     tag : str
-        The tag or ID of the image.
-    file : Union[str, os.PathLike[str]]
+        The tag of the image
+    file : os.PathLike[str] | str
         The file to be output to.
     env_name: str
         The name of the environment. Defaults to "base".

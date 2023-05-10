@@ -99,7 +99,7 @@ def data_fetch(
     mount: Union[os.PathLike[str], str],
     all: bool = False,
     no_cache: bool = False,
-    verbose_stderr: bool = False
+    verbose_stderr: bool = False,
 ) -> None:
     """
     Fetch and cache the set of items that were returned by a query on a database file.
@@ -147,11 +147,13 @@ def data_fetch(
     tasks: List[threading.Thread] = []
 
     for data_item in data_values:
-        tasks.append(threading.Thread(
-            target=_request_data_item,
-            args=(data_item, mount_point, no_cache, verbose_stderr),
-            name=f"{data_item}_DOWNLOADER"
-        ))
+        tasks.append(
+            threading.Thread(
+                target=_request_data_item,
+                args=(data_item, mount_point, no_cache, verbose_stderr),
+                name=f"{data_item}_DOWNLOADER",
+            )
+        )
 
     for task in tasks:
         task.start()
@@ -161,9 +163,9 @@ def data_fetch(
 
 def _request_data_item(
     data_item: Dict[str, Union[str, Dict[str, str]]],
-    mount_point: Mount,
+    mount_point: BindMount,
     no_cache: bool,
-    verbose_stderr: bool
+    verbose_stderr: bool,
 ) -> None:
     """
     Given a description of a data item, use a given image to fetch and cache its files.
@@ -217,8 +219,5 @@ def _request_data_item(
     stderr = None if verbose_stderr else DEVNULL
 
     rover_image.run(
-        command=command,
-        host_user=True,
-        mounts=[mount_point],
-        stderr=stderr
+        command=command, host_user=True, bind_mounts=[mount_point], stderr=stderr
     )

@@ -5,7 +5,7 @@ import os
 from shlex import split
 from subprocess import DEVNULL, CalledProcessError, run
 from sys import stdin
-from typing import Any, Iterable, List, Optional, Type, TypeVar, Union, overload
+from typing import Any, Iterable, List, Optional, Type, TypeVar, overload
 
 from ._bind_mount import BindMount
 from ._exceptions import CommandNotFoundError, DockerBuildError, ImageNotFoundError
@@ -45,8 +45,8 @@ class Image:
         cls: Type[Self],
         tag: str,
         *,
-        dockerfile: Union[str, os.PathLike[str]],
-        context: Union[str, os.PathLike[str]] = ...,
+        dockerfile: os.PathLike[str] | str,
+        context: os.PathLike[str] | str = ...,
         stdout: Any = ...,
         stderr: Any = ...,
         network: str = ...,
@@ -97,7 +97,7 @@ class Image:
         tag: str,
         *,
         dockerfile_string: str,
-        context: Union[str, os.PathLike[str]] = ...,
+        context: os.PathLike[str] | str = ...,
         stdout: Any = ...,
         stderr: Any = ...,
         network: str = ...,
@@ -232,7 +232,7 @@ class Image:
         network: str = "host",
         check: bool = True,
         host_user: bool = False,
-        mounts: Iterable[BindMount] | None = None,
+        bind_mounts: Iterable[BindMount] | None = None,
     ) -> str:
         """
         Run the given command on a container.
@@ -260,8 +260,8 @@ class Image:
         host_user: bool, optional
             If True, run the command as the user on the host machine, else run as the
             default user. Defaults to False.
-        mounts : Iterable[BindMount], optional
-            A list of mount descriptions to apply to the run command.
+        bind_mounts : Iterable[BindMount], optional
+            A list of bind mount descriptions to apply to the run command.
 
         Returns
         -------
@@ -277,8 +277,8 @@ class Image:
         cmd = ["docker", "run", f"--network={network}", "--rm"]
         if host_user:
             cmd += ["-u", f"{os.getuid()}:{os.getgid()}"]
-        if mounts is not None:
-            for mount in mounts:
+        if bind_mounts is not None:
+            for mount in bind_mounts:
                 cmd += ["-v", f"{mount.mount_string()}"]
         if interactive:
             cmd += ["-i"]

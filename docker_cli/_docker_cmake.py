@@ -27,7 +27,7 @@ def build_prefix() -> str:
     return "/tmp/build"
 
 
-def cmake_config_dockerfile(build_type: str) -> str:
+def cmake_config_dockerfile(build_type: str, with_cuda: bool = True) -> str:
     """
     Creates a dockerfile for configuring CMAKE.
 
@@ -35,13 +35,23 @@ def cmake_config_dockerfile(build_type: str) -> str:
     ----------
     build_type : str
         The CMAKE build type.
+    with_cuda : bool
+        Whether or not to use CUDA in the build. Defaults to True.
 
     Returns
     -------
-    str
+    body : str
         The generated Dockerfile body.
     """
-    body = (
+    # Parsing the additional arguments and then joining them as a list because I have
+    # a feeling there may be additional cmake arguments to add in the future, and this
+    # keeps that process simple.
+    additional_args = []
+    if with_cuda:
+        additional_args += ["-DWITH_CUDA=YES"]
+
+    cmake_extra_args = " ".join(additional_args)
+    body: str = (
         micromamba_docker_lines()
         + "\n\n"
         + dedent(
@@ -53,9 +63,12 @@ def cmake_config_dockerfile(build_type: str) -> str:
         RUN cmake \\
             -B $BUILD_PREFIX \\
             -G Ninja \\
+            -DISCE3_FETCH_DEPS=NO \\
             -DCMAKE_BUILD_TYPE={build_type} \\
             -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \\
             -DCMAKE_PREFIX_PATH=$MAMBA_ROOT_PREFIX \\
+            -DWITH_CUDA=YES \\
+            {cmake_extra_args} \\
             .
     """
         ).strip()

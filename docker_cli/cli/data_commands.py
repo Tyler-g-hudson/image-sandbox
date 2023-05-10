@@ -90,8 +90,10 @@ def init_data_parsers(subparsers: argparse._SubParsersAction) -> None:
         help="If used, delete and reinstall all requested items.",
     )
     fetch_parser.add_argument(
-        "--verbose-stderr", action="store_true", default=False,
-        help='If used, print verbose error output.'
+        "--verbose-stderr",
+        action="store_true",
+        default=False,
+        help="If used, print verbose error output.",
     )
 
 
