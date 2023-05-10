@@ -269,6 +269,7 @@ def build_all(
     Dict[str, Image]
         A dict of images produced by this process.
     """
+    
     prefix = universal_tag_prefix()
 
     images: Dict[str, Image] = {}
