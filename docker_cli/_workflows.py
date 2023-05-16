@@ -30,8 +30,29 @@ class TextRunconfigWorkflow(GenericSASWorkflow):
         return f"python -m nisar.workflows.{self.module} @{runconfig}"
 
 
+class SoilMoistureWorkflow(GenericSASWorkflow):
+    def get_command(self, runconfig: os.PathLike[str] | str) -> str:
+        return f"micromamba run -n SoilMoisture NISAR_SM_SAS {runconfig}"
+
+
 def get_workflow_object(workflow_name: str) -> Workflow:
     """
+    Returns a Workflow object given the name of the workflow.
+
+    Parameters
+    ----------
+    workflow_name : str
+        The name of the workflow.
+
+    Returns
+    -------
+    Workflow
+        The associated Workflow object.
+
+    Raises
+    ------
+    ValueError
+        If the given workflow name is not recognized.
     """
     if workflow_name in ["gslc", "gcov", "insar"]:
         return GenericSASWorkflow(workflow_name)

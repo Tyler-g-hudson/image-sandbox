@@ -133,3 +133,5 @@ def run_util(args: argparse.Namespace, command: str) -> None:
         make_lockfile(**vars(args))
     elif command == "test":
         test(**vars(args))
+    elif command == "workflow":
+        workflow(**vars(args))

@@ -49,9 +49,9 @@ def cmake_config_dockerfile(
     dockerfile : str
         The generated Dockerfile.
     """
-    # Parsing the additional arguments and then joining them as a list because there may
-    # be additional cmake arguments to add in the future, and this simplifies the
-    # process of adding them.
+    # Listing the additional arguments and then joining them later, because I have
+    # a feeling there may be additional cmake arguments to add in the future, and this
+    # keeps that process simple.
     additional_args = []
     if with_cuda:
         additional_args += ["-DWITH_CUDA=YES"]
