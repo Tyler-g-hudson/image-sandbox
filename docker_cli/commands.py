@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import os
 import re
-import shutil
-import tempfile
 from pathlib import Path
 from shlex import split
 from subprocess import CalledProcessError, DEVNULL, PIPE, run
@@ -23,7 +21,8 @@ from ._docker_git import git_clone_dockerfile
 from ._docker_mamba import mamba_lockfile_command
 from ._image import Image
 from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
-from ._workflows import get_test_info, get_workflow_object, Workflow
+from ._workflows import get_test_info, run_workflow, workflow_mounts
+from ._input_finder import get_input_files_for_test
 
 
 def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = False):
@@ -426,7 +425,7 @@ def workflow(
     workflow_name: str,
     test: str,
     input_dirs: Sequence[str],
-    cache_dirs: List[str],
+    cache_dirs: Sequence[str],
     output_dir: str,
     test_file: str,
     scratch_dir: str
@@ -444,7 +443,7 @@ def workflow(
     input_dirs : Sequence[str]
         A sequence of directories associated with the test inputs. Can be tagged in
         format: "[TAG]:[DIRECTORY]" or "[INPUT_NAME]:[DIRECTORY]".
-    cache_dirs : List[str]
+    cache_dirs : Sequence[str]
         A sequence of directories to check for inputs as cache directories.
     output_dir : str
         The location of the directory for test outputs.
@@ -463,106 +462,50 @@ def workflow(
     # Instantiate the Image object to run the workflow on
     workflow_img = Image(image)
 
-    # Add the default cache location to cache_dirs
-    cache_dirs += ["./cache"]
-
     # Get the test information and type (i.e. "single", "multi") from the test dict.
     test_obj, test_type = get_test_info(
         workflow_name=workflow_name, test_name=test, filename=test_file
     )
 
-    # If the output directory doesn't exist on the host, make it.
-    if not os.path.isdir(f"{output_dir}/{workflow_name}/{test}"):
-        os.makedirs(f"{output_dir}/{workflow_name}/{test}")
-    # Create the output directory bind mount, place it in the bind mounts basic list.
-    # This list will be copied and used for all tests that are run.
-    basic_bind_mounts = [
-        BindMount(
-            image_mount_point=f"{install_prefix()}/output/{workflow_name}",
-            host_mount_point=os.path.abspath(f"{output_dir}/{workflow_name}"),
-            permissions="rw"
-        )
-    ]
+    # Add the default cache location to cache_dirs
+    cache_dirs = list(cache_dirs) + ["./cache"]
 
-    # If requested, add a local mount for the scratch directories.
-    # Otherwise, add a temporary one so the docker container can get rw permissions.
-    temp_scratch: bool = scratch_dir is None
-
-    if temp_scratch:
-        # Create the temp scratch file
-        host_scratch_dir: str = tempfile.mkdtemp()
-    else:
-        # Create the scratch file if it doesn't already exist
-        if not os.path.isdir(f"{scratch_dir}/{workflow_name}/{test}"):
-            os.makedirs(f"{scratch_dir}/{workflow_name}/{test}")
-        host_scratch_dir = os.path.abspath(scratch_dir)
-
-    # Create the scratch file bind mount
-    basic_bind_mounts.append(BindMount(
-        image_mount_point=f"{install_prefix()}/scratch/{workflow_name}",
-        host_mount_point=host_scratch_dir,
-        permissions="rw"
-    ))
+    # Get the input directories.
+    input_files = get_input_files_for_test(
+        test_info=test_obj, cache_dirs=cache_dirs, input_dirs=input_dirs
+    )
 
     if test_type == "single":
-        bind_mounts = basic_bind_mounts.copy()
-
-        # Add the runconfig mount to the install prefix directory
-        runconfig_lookup_path: str = f"runconfigs/{workflow_name}/"
-
         runconfig = test_obj["runconfig"]
         # Catch if the runconfig field for this test is malformed
         if not isinstance(runconfig, str):
             raise ValueError(f"Runconfig value of test {workflow_name}/{test} has type "
                              f"{type(runconfig)}; expected string.")
 
-        # Get the runconfig path on the host and image
-        runconfig_host_path = os.path.abspath(f"{runconfig_lookup_path}{runconfig}")
-        runconfig_image_path = f"{install_prefix()}/{runconfig}"
-
-        # If the runconfig doesn't exist at the expected location, this is an error
-        if not os.path.isfile(runconfig_host_path):
-            raise ValueError(
-                f"Runconfig {runconfig} not found at {runconfig_host_path}."
+        # Setup workflow mounts. Automatically generates and removes temporary files
+        # if necessary.
+        with workflow_mounts(
+            workflow_name=workflow_name,
+            test=test,
+            runconfig=runconfig,
+            input_files=input_files,
+            output_dir=output_dir,
+            scratch_dir=scratch_dir
+        ) as bind_mounts:
+            # Run the workflow.
+            run_workflow(
+                workflow_img=workflow_img,
+                workflow_name=workflow_name,
+                runconfig=runconfig,
+                bind_mounts=bind_mounts
             )
 
-        # Create the runconfig file bind mount
-        bind_mounts.append(BindMount(
-            host_mount_point=runconfig_host_path,
-            image_mount_point=runconfig_image_path,
-            permissions="ro"
-        ))
-
-        # Find and add all input file bind mount locations.
-        input_files: Dict[str, os.PathLike[str] | str] = get_input_files_for_test(
-            test_info=test_obj, cache_dirs=cache_dirs, input_dirs=input_dirs
-        )
-        for repo in input_files:
-            host_path = os.path.abspath(input_files[repo])
-            image_path = f"{install_prefix()}/input/{repo}"
-            bind_mounts.append(BindMount(
-                image_mount_point=image_path,
-                host_mount_point=host_path,
-                permissions="ro"
-            ))
-
-        # Get the test command.
-        workflow_obj: Workflow = get_workflow_object(workflow_name=workflow_name)
-        command = workflow_obj.get_command(runconfig=runconfig)
-
-        # Run the test on the image.
-        try:
-            workflow_img.run(command, bind_mounts=bind_mounts, host_user=True)
-        except CalledProcessError as err:
-            print(f"Workflow test failed with message with stderr:\n{err.stderr}")
-
-    else:
+    elif test_type == "multi":
         # TODO: Add multitest support
         raise NotImplementedError("Multi tests not implemented")
 
-    # If a temporary scratch file was created, remove it.
-    if temp_scratch:
-        shutil.rmtree(host_scratch_dir)
+    else:
+        raise ValueError(f"Test type {test_type} not recognized.")
 
 
 def dropin(tag: str) -> None:
