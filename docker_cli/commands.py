@@ -483,6 +483,9 @@ def workflow(
             raise ValueError(f"Runconfig value of test {workflow_name}/{test} has type "
                              f"{type(runconfig)}; expected string.")
 
+        print(f"Running workflow test: {workflow_name} {test} on image: "
+              f"{workflow_img.id}")
+
         # Setup workflow mounts. Automatically generates and removes temporary files
         # if necessary.
         with workflow_mounts(

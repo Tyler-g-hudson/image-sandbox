@@ -295,6 +295,13 @@ def run_series_workflow(
         # directory. This is done by passing "test" into workflow_mounts.
         test_name = test_info["tag"] if "tag" in test_info.keys() else None
 
+        printout: str = f"\nRunning workflow test: {main_test_name} {workflow_name} "
+        if test_name is not None:
+            printout += f"{test_name} "
+        printout += f"on image: {image.id}.\n"
+
+        print(printout)
+
         # Setup workflow mounts. Automatically generates and removes temporary files
         # if necessary.
         with workflow_mounts(
