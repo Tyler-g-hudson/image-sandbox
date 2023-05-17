@@ -79,7 +79,7 @@ def get_test_info(
     workflow_name: str,
     test_name: str,
     filename: str = "workflowtests.json"
-) -> Tuple[Dict[str, str | List[str] | Dict[str, str]], str]:
+) -> Tuple[Dict[str, str | List[Dict[str, str]] | Dict[str, str]], str]:
     """
     Get test data from the given file.
 
@@ -122,7 +122,8 @@ def get_test_info(
 @contextmanager
 def workflow_mounts(
     workflow_name: str,
-    test: str,
+    test: Optional[str],
+    *,
     runconfig: str,
     input_files: Mapping[str, os.PathLike[str] | str],
     output_dir: str,
@@ -138,8 +139,9 @@ def workflow_mounts(
     ----------
     workflow_name : str
         The name of the workflow.
-    test : str
-        The name of the test.
+    test : str, optional
+        The name of the test. If None is given, then a test subdirectory will not be
+        added to the output and scratch directories.
     runconfig : str
         The path to the runconfig.
     input_files : Mapping[str, os.PathLike[str]  |  str]
@@ -167,9 +169,10 @@ def workflow_mounts(
         If the runconfig is not found at the expected location.
     """
 
+    test_subdir = f"{workflow_name}/{test}" if test is not None else workflow_name
     # If the output directory doesn't exist on the host, make it.
-    if not os.path.isdir(f"{output_dir}/{workflow_name}/{test}"):
-        os.makedirs(f"{output_dir}/{workflow_name}/{test}")
+    if not os.path.isdir(f"{output_dir}/{test_subdir}"):
+        os.makedirs(f"{output_dir}/{test_subdir}")
     # Create the output directory bind mount, place it in the bind mounts basic list.
     # This list will be copied and used for all tests that are run.
     bind_mounts = [
@@ -189,8 +192,8 @@ def workflow_mounts(
         host_scratch_dir: str = tempfile.mkdtemp()
     else:
         # Create the scratch file if it doesn't already exist
-        if not os.path.isdir(f"{scratch_dir}/{workflow_name}/{test}"):
-            os.makedirs(f"{scratch_dir}/{workflow_name}/{test}")
+        if not os.path.isdir(f"{scratch_dir}/{test_subdir}"):
+            os.makedirs(f"{scratch_dir}/{test_subdir}")
         assert isinstance(scratch_dir, str)
         host_scratch_dir = os.path.abspath(scratch_dir)
 
@@ -240,14 +243,34 @@ def workflow_mounts(
 def run_series_workflow(
     image: Image,
     main_test_name: str,
+    *,
     output_dir: str,
-    input_dirs: Mapping[str, str],
+    input_dirs: Mapping[str, str | os.PathLike[str]],
     scratch_dir: Optional[str],
-    output_subdir: str,
     test_series_info: Sequence[Mapping[str, Any]]
 ) -> None:
+    """
+    Run a series of workflow tests in order.
+
+    Parameters
+    ----------
+    image : Image
+        The image to run the workflow tests on.
+    main_test_name : str
+        The name of the overall workflow test that the series is running on.
+    output_dir : str
+        The host output directory.
+    input_files : Mapping[str, str]
+        A mapping connecting input datasets to their host file location.
+    scratch_dir : str, optional
+        The host scratch directory. If None, a temp directory will be generated.
+    test_series_info : Sequence[Mapping[str, Any]]
+        A series of
+    """
     for test_info in test_series_info:
         workflow_name = test_info["workflow"]
+        # If the workflow is a series workflow, recurse and run that workflow before
+        # proceeding to the next item.
         if workflow_name == "series":
             subseries_info = test_info["series"]
             run_series_workflow(
@@ -256,31 +279,27 @@ def run_series_workflow(
                 output_dir=output_dir,
                 input_dirs=input_dirs,
                 scratch_dir=scratch_dir,
-                output_subdir=output_subdir,
                 test_series_info=subseries_info
             )
             continue
-        if workflow_name == "parallel":
-            continue
-        runconfig = test_info["runconfig"]
-        runconfig_location = f"runconfig/{main_test_name}"
 
-        # Determine the location of the subtest output directory.
-        directory_structure = [output_dir, workflow_name]
+        # Parallel tests not implemented yet.
+        if workflow_name == "parallel":
+            raise NotImplementedError("Parallel tests not implemented.")
+
+        # Get the location of the runconfig
+        runconfig = test_info["runconfig"]
+        runconfig_location = f"runconfigs/{main_test_name}"
+
         # If the test is tagged, this tag will be a subdirectory under the test
-        # directory.
-        if "tag" in test_info.keys():
-            directory_structure.append(test_info["tag"])
-        test_output_dir = "/".join(directory_structure)
-        # If this location doesn't exist, create it.
-        if not os.path.isdir(test_output_dir):
-            os.makedirs(test_output_dir)
+        # directory. This is done by passing "test" into workflow_mounts.
+        test_name = test_info["tag"] if "tag" in test_info.keys() else None
 
         # Setup workflow mounts. Automatically generates and removes temporary files
         # if necessary.
         with workflow_mounts(
             workflow_name=workflow_name,
-            test=main_test_name,
+            test=test_name,
             runconfig=runconfig,
             input_files=input_dirs,
             output_dir=output_dir,
@@ -294,33 +313,6 @@ def run_series_workflow(
                 runconfig=runconfig,
                 bind_mounts=bind_mounts
             )
-
-    """
-    - runner image
-    - output file location
-    - scratch file location?
-    - input file locations
-    - overall test output file local path
-    - series or parallel list
-        - tests,
-            - workflow
-            - ?tag
-            - runconfig
-        - recurse series or parallel list ^
-
-    output files @:
-        {output_loc}/{overall workflow name}/{test_name}/{sub_workflow_name}/?{tag}
-    initially build directory:
-        {output_loc}/{overall workflow name}/{test_name}/
-    ^^^^^^^^^^^^ MOUNT THIS DIRECTORY AS THE OUTPUT DIRECTORY ^^^^^^^^^^^^
-    -   DO THIS PRIOR TO CALLING THIS FUNCTION
-    -   Can recursively add deeper folders in case of nested parallels and series?
-        -   This sounds like it could get unnecessarily complicated. If people want to
-            do things like this, they should use tags instead.
-    For each test, build subdirectory prior to test run:
-        /{sub_workflow_name}/?{tag}
-    """
-    ...
 
 
 def run_workflow(

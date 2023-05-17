@@ -5,7 +5,7 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 
 def get_input_files_for_test(
-    test_info: Mapping[str, str | Sequence[str] | Mapping[str, str]],
+    test_info: Mapping[str, str | Sequence[Mapping[str, str]] | Mapping[str, str]],
     cache_dirs: Sequence[str],
     input_dirs: Optional[Sequence[str]] = None
 ) -> Dict[str, os.PathLike[str] | str]:
@@ -199,14 +199,17 @@ def _in_cache(
 
 
 def generate_search_tables(
-    test_dict: Mapping[str, str | Sequence[str] | Mapping[str, str]]
+    test_dict: Mapping[str, str | Sequence[str | Mapping[str, str]] | Mapping[str, str]]
 ) -> Tuple[List[str], Dict[str, str]]:
     """
     Generates the search tables for the given test information.
 
     Parameters
     ----------
-    test_dict : Mapping[str, str  |  List[str]  |  Mapping[str, str]]
+    test_dict : Mapping[
+                    str,
+                    str | Sequence[str | Mapping[str, str]] | Mapping[str, str]
+                ]
         A dictionary representing information about a test.
 
     Returns
@@ -228,8 +231,10 @@ def generate_search_tables(
 
     if isinstance(inputs, str):
         input_repositories = [inputs]
+    elif isinstance(inputs, list):
+        input_repositories = inputs
     else:
-        input_repositories = list(inputs)
+        raise ValueError(f"Unexpected input type for test: {type(inputs)}")
 
     for input in input_repositories:
         input_label_dict[input] = input
