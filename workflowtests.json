@@ -229,44 +229,37 @@
         "series": [
           {
             "workflow": "rslc",
-            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml",
-            "inputs": "L0B_RRSD_ALPSRP262866750_Chile"
+            "tag": "ref",
+            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml"
           },
-
           {
             "workflow": "rslc",
-            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml",
-            "inputs": "L0B_RRSD_ALPSRP269576750_Chile"
+            "tag": "sec",
+            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml"
           },
-
           {
             "workflow": "gslc",
-            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml",
-            "inputs": ["rslc_ref", "L0B_RRSD_ALPSRP262866750_Chile"]
+            "tag": "ref",
+            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml"
           },
-
           {
             "workflow": "gslc",
-            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml",
-            "inputs": ["rslc_sec", "L0B_RRSD_ALPSRP269576750_Chile"]
+            "tag": "sec",
+            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml"
           },
-
           {
             "workflow": "gcov",
-            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml",
-            "inputs": ["rslc_ref", "L0B_RRSD_ALPSRP262866750_Chile"]
+            "tag": "ref",
+            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml"
           },
-
           {
             "workflow": "gcov",
-            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml",
-            "inputs": ["rslc_sec", "L0B_RRSD_ALPSRP269576750_Chile"]
+            "tag": "sec",
+            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml"
           },
-
           {
             "workflow": "insar",
-            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile.yaml",
-            "inputs": ["rslc_ref", "rslc_sec", "L0B_RRSD_ALPSRP262866750_Chile"]
+            "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile.yaml"
           }
         ]
       },
@@ -279,49 +272,37 @@
         "series": [
           {
             "workflow": "rslc",
-            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml",
-            "inputs": "L0B_RRSD_ALPSRP110160680_Rosamond"
+            "tag": "ref",
+            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml"
           },
-
           {
             "workflow": "rslc",
-            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml",
-            "inputs": "L0B_RRSD_ALPSRP116870680_Rosamond"
+            "tag": "sec",
+            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml"
           },
-
           {
             "workflow": "gslc",
-            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml",
-            "inputs": ["rslc_ref", "L0B_RRSD_ALPSRP110160680_Rosamond"]
+            "tag": "ref",
+            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml"
           },
-
           {
             "workflow": "gslc",
-            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml",
-            "inputs": ["rslc_sec", "L0B_RRSD_ALPSRP116870680_Rosamond"]
+            "tag": "sec",
+            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml"
           },
-
           {
             "workflow": "gcov",
-            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml",
-            "inputs": ["rslc_ref", "L0B_RRSD_ALPSRP110160680_Rosamond"]
+            "tag": "ref",
+            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml"
           },
-
           {
             "workflow": "gcov",
-            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml",
-            "inputs": ["rslc_sec", "L0B_RRSD_ALPSRP116870680_Rosamond"]
+            "tag": "sec",
+            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml"
           },
-
           {
             "workflow": "insar",
-            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond.yaml",
-            "inputs": [
-              "rslc_sec",
-              "rslc_ref",
-              "L0B_RRSD_ALPSRP110160680_Rosamond",
-              "L0B_RRSD_ALPSRP116870680_Rosamond"
-            ]
+            "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond.yaml"
           }
         ]
       }

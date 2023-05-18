@@ -21,8 +21,8 @@ from ._docker_git import git_clone_dockerfile
 from ._docker_mamba import mamba_lockfile_command
 from ._image import Image
 from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
-from ._workflows import (get_test_info, run_series_workflow, run_workflow,
-                         workflow_mounts)
+from ._workflows import (WorkflowParams, get_test_info, run_series_workflow,
+                         run_workflow)
 from ._input_finder import get_input_files_for_test
 
 
@@ -486,23 +486,18 @@ def workflow(
         print(f"Running workflow test: {workflow_name} {test} on image: "
               f"{workflow_img.id}")
 
-        # Setup workflow mounts. Automatically generates and removes temporary files
-        # if necessary.
-        with workflow_mounts(
+        params: WorkflowParams = WorkflowParams(
+            image=workflow_img, image_tag=image, input_dict=input_dir_map,
+            output_dir=output_dir, scratch_dir=scratch_dir
+        )
+
+        # Run the workflow.
+        run_workflow(
+            test_params=params,
             workflow_name=workflow_name,
             test=test,
-            runconfig=runconfig,
-            input_files=input_dir_map,
-            output_dir=output_dir,
-            scratch_dir=scratch_dir
-        ) as bind_mounts:
-            # Run the workflow.
-            run_workflow(
-                workflow_img=workflow_img,
-                workflow_name=workflow_name,
-                runconfig=runconfig,
-                bind_mounts=bind_mounts
-            )
+            runconfig=runconfig
+        )
 
     # Multitests run in the recursive run_series_workflow function.
     elif test_type == "multi":
@@ -512,14 +507,17 @@ def workflow(
         # This is a list of test information dictionaries held under the series workflow
         series_info = test_obj["series"]
         assert isinstance(series_info, list)
+
+        params = WorkflowParams(
+            image=workflow_img, image_tag=image, input_dict=input_dir_map,
+            output_dir=multi_test_output_dir, scratch_dir=scratch_dir
+        )
+
         # This method runs all of the tests in order.
         run_series_workflow(
-            image=workflow_img,
+            test_params=params,
             main_test_name=workflow_name,
-            output_dir=multi_test_output_dir,
-            input_dirs=input_dir_map,
-            scratch_dir=scratch_dir,
-            test_series_info=series_info
+            test_sequence_info=series_info
         )
 
     else:

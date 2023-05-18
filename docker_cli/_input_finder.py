@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 
@@ -8,7 +9,7 @@ def get_input_files_for_test(
     test_info: Mapping[str, str | Sequence[Mapping[str, str]] | Mapping[str, str]],
     cache_dirs: Sequence[str],
     input_dirs: Optional[Sequence[str]] = None
-) -> Dict[str, os.PathLike[str] | str]:
+) -> Dict[str, Path]:
     """
     Associates the input repositories needed by a given test with their locations.
 
@@ -27,8 +28,8 @@ def get_input_files_for_test(
 
     Returns
     -------
-    Dict[str, str]
-        A dictionary in {input_repository:host_path} format.
+    Dict[str, Path]
+        A dictionary relating the needed repositories to their paths.
     """
     if input_dirs is not None:
         labels_to_dirs = input_dict_parse(input_dirs)
@@ -52,7 +53,7 @@ def search_for_inputs(
     label_repo_dict: Mapping[str, str],
     cache_dirs: Sequence[os.PathLike[str] | str],
     input_dirs: Optional[str | Mapping[str, os.PathLike[str] | str]] = None
-) -> Dict[str, os.PathLike[str] | str]:
+) -> Dict[str, Path]:
     """
     Finds the locations of all needed input repositories.
 
@@ -69,7 +70,7 @@ def search_for_inputs(
 
     Returns
     -------
-    Dict[str, os.PathLike[str]]
+    Dict[str, Path]
         A dictionary relating the needed repositories to their paths.
 
     Raises
@@ -82,12 +83,12 @@ def search_for_inputs(
     # If there are more needed inputs, this constitutes an error.
     if isinstance(input_dirs, str):
         if len(required_repositories) == 1:
-            return {required_repositories[0]: input_dirs}
+            return {required_repositories[0]: Path(input_dirs)}
         raise ValueError("Unlabeled input directories only allowed for tests with "
                          "only one input.")
 
     # The dictionary to be output: Maps repositories to their paths.
-    inputs_to_paths: Dict[str, os.PathLike[str] | str] = {}
+    inputs_to_paths: Dict[str, Path] = {}
     # A copy of the list of repositories being searched for, to be checked in case
     # a repository was not found.
     unmatched_repositories: List[str] = []
@@ -110,9 +111,9 @@ def search_for_inputs(
         for label in accepted_labels:
             repo = label_repo_dict[label]
             if repo not in unmatched_repositories:
-                raise ValueError(f"Repository {repo} referenced twice.")
+                raise ValueError(f"Repository {repo} referenced multiple times.")
             path = input_dirs[label]
-            inputs_to_paths[repo] = path
+            inputs_to_paths[repo] = Path(path)
             unmatched_input_dir_paths.remove(path)
             unmatched_repositories.remove(repo)
 
@@ -131,7 +132,7 @@ def search_for_inputs(
         )
         for repo in found_repos:
             unmatched_repositories.remove(repo)
-            inputs_to_paths[repo] = f"{cache_dir}/{repo}"
+            inputs_to_paths[repo] = Path(f"{cache_dir}/{repo}")
         if len(unmatched_repositories) == 0:
             break
 
