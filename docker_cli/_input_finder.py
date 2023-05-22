@@ -125,6 +125,8 @@ def search_for_inputs(
 
     # Search in the cache dirs for the given repo names.
     for cache_dir in cache_dirs:
+        # Find all repos in this cache dir that are in the unmached_repositories list
+        # and record their location.
         found_repos = list(
             filter(
                 lambda repo: (_in_cache(cache_dir, repo)), unmatched_repositories
@@ -133,6 +135,7 @@ def search_for_inputs(
         for repo in found_repos:
             unmatched_repositories.remove(repo)
             inputs_to_paths[repo] = Path(f"{cache_dir}/{repo}")
+        # If all repositories have been found, stop checking caches for them.
         if len(unmatched_repositories) == 0:
             break
 

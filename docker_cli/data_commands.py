@@ -128,22 +128,27 @@ def data_fetch(
         command="echo $MOUNT_LOCATION", stdout=PIPE
     ).strip()
 
+    # Acquire the path of the mount on the host
     host_mount_path = Path(mount)
+    # If it isn't already a directory, create it
     if not host_mount_path.is_dir():
         cmd = ["mkdir", "-p", mount]
         run(cmd, check=True)
     host_mount_abspath = host_mount_path.resolve()
 
+    # Build the host bind mount object
     mount_point = BindMount(
         src=host_mount_abspath,
         dst=image_mount_loc,
         permissions="rw",
     )
 
+    # Find the locations of the data in the database
     data_values = data_search(
         file=file, tags=tags, names=names, fields=["name", "url", "files"], all=all
     )
 
+    # Construct the set of tasks to fetch each data item.
     tasks: List[threading.Thread] = []
 
     for data_item in data_values:
@@ -155,8 +160,10 @@ def data_fetch(
             )
         )
 
+    # Begin performing each of the fetch tasks.
     for task in tasks:
         task.start()
+    # Await completion.
     for task in tasks:
         task.join()
 
@@ -206,6 +213,7 @@ def _request_data_item(
         assert isinstance(hash, str)
         file_kvps.append(f"{filename}={hash}")
 
+    # Construct the command to be run.
     cmd = ["python", "-m", "rover", "fetch", "--repo", repo, "--url", url]
     if no_cache:
         cmd += ["--no-cache"]
@@ -218,6 +226,7 @@ def _request_data_item(
 
     stderr = None if verbose_stderr else DEVNULL
 
+    # Run the request on the rover image.
     rover_image.run(
         command=command, host_user=True, bind_mounts=[mount_point], stderr=stderr
     )

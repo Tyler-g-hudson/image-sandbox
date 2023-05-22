@@ -17,12 +17,16 @@ from ._image import Image
 
 
 class Workflow(ABC):
+    """A workflow handler. Abstract."""
+
     @abstractmethod
     def get_command(self, runconfig: os.PathLike[str] | str) -> str:
         ...
 
 
 class GenericSASWorkflow(Workflow):
+    """A handler for typical SAS workflows."""
+
     def __init__(self, module: str) -> None:
         self.module = module
 
@@ -31,16 +35,22 @@ class GenericSASWorkflow(Workflow):
 
 
 class InSARWorkflow(GenericSASWorkflow):
+    """A handler for the InSAR workflow."""
+
     def get_command(self, runconfig: os.PathLike[str] | str) -> str:
         return super().get_command(runconfig) + " -- restart"
 
 
 class TextRunconfigWorkflow(GenericSASWorkflow):
+    """A handler for workflows whose runconfig is a text file."""
+
     def get_command(self, runconfig: os.PathLike[str] | str) -> str:
         return f"python -m nisar.workflows.{self.module} @{runconfig}"
 
 
 class SoilMoistureWorkflow(GenericSASWorkflow):
+    """A handler for the SoilMoisture workflow."""
+
     def get_command(self, runconfig: os.PathLike[str] | str) -> str:
         return f"micromamba run -n SoilMoisture NISAR_SM_SAS {runconfig}"
 
@@ -279,25 +289,25 @@ def run_series_workflow(
 
         # Get the location of the runconfig
         runconfig = test_info["runconfig"]
-        runconfig_location = Path("runconfigs")/main_test_name
+        runconfig_path = Path("runconfigs")/main_test_name
 
         # If the test is tagged, this tag will be a subdirectory under the test
         # directory. This is done by passing "test" into workflow_mounts.
         test_name = test_info["tag"] if "tag" in test_info.keys() else None
 
-        printout: str = f"\nRunning workflow test: {main_test_name} {workflow_name} "
+        test_msg: str = f"\nRunning workflow test: {main_test_name} {workflow_name} "
         if test_name is not None:
-            printout += f"{test_name} "
-        printout += f"on image: {test_params.image_tag}.\n"
+            test_msg += f"{test_name} "
+        test_msg += f"on image: {test_params.image_tag}.\n"
 
-        print(printout)
+        print(test_msg)
         # Run the workflow.
         run_workflow(
             test_params=test_params,
             workflow_name=workflow_name,
             test=test_name,
             runconfig=runconfig,
-            runconfig_dir=str(runconfig_location)
+            runconfig_dir=str(runconfig_path)
         )
 
 
@@ -352,7 +362,7 @@ def run_workflow(
 
 
 class WorkflowParams:
-    """Parameters for a workflow."""
+    """A data container holding parameters for a workflow."""
 
     def __init__(
         self,
@@ -362,10 +372,16 @@ class WorkflowParams:
         output_dir: str | Path,
         scratch_dir: Optional[str | Path]
     ):
+        # The image that the workflow is to be run on.
         self._image: Image = image
+        # The tag of the above image.
         self._image_tag: str = image_tag
+        # The mapping that connects the workflow inputs to its host locations.
         self._input_dict: Mapping[str,  Path] = input_dict
+        # The output directory on the host.
         self._output_dir: Path = Path(output_dir).absolute()
+        # The scratch directory on the host, or None if no scratch directory is
+        # specified.
         if scratch_dir is not None:
             self._scratch_dir: Optional[Path] = Path(scratch_dir).absolute()
         else:
