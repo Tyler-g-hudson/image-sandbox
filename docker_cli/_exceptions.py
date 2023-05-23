@@ -38,3 +38,10 @@ class ImageNotFoundError(Exception):
         """
         self.tag_or_id = tag_or_id
         super().__init__(f'Docker image "{tag_or_id}" not found.')
+
+
+class TestFailedError(Exception):
+    """Raised when a test fails."""
+
+    def __init__(self, message: str = ""):
+        super().__init__(message)

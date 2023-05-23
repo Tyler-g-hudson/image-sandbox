@@ -13,6 +13,7 @@ from typing import (Any, Dict, Iterator, List, Mapping, Optional, Sequence,
 
 from ._bind_mount import BindMount
 from ._docker_cmake import install_prefix
+from ._exceptions import TestFailedError
 from ._image import Image
 
 
@@ -358,7 +359,8 @@ def run_workflow(
         try:
             test_params.image.run(command, bind_mounts=bind_mounts, host_user=True)
         except CalledProcessError as err:
-            print(f"Workflow test failed with message with stderr:\n{err.stderr}")
+            raise TestFailedError("Workflow test failed with stderr:\n" +
+                                  err.stderr) from err
 
 
 class WorkflowParams:
