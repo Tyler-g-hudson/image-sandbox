@@ -483,8 +483,8 @@ def workflow(
             raise ValueError(f"Runconfig value of test {workflow_name}/{test} has type "
                              f"{type(runconfig)}; expected string.")
 
-        print(f"Running workflow test: {workflow_name} {test} on image: "
-              f"{workflow_img.id}")
+        print(f"\nRunning workflow test: {workflow_name} {test} on image: "
+              f"{workflow_img.id}\n")
 
         params: WorkflowParams = WorkflowParams(
             image=workflow_img, image_tag=image, input_dict=input_dir_map,

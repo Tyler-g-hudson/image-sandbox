@@ -317,7 +317,7 @@ def run_workflow(
     workflow_name: str,
     test: Optional[str],
     runconfig: str,
-    runconfig_dir: str = "runconfig"
+    runconfig_dir: str = "runconfigs"
 ) -> None:
     """Runs a workflow test on the given image.
 
