@@ -1,7 +1,7 @@
 import argparse
 from typing import List
 
-from ..commands import build_all, clone, compile, configure, distributable, install
+from ..commands import build_all, clone, compile, configure, distributable, insert, install
 from ._utils import add_tag_argument, help_formatter
 
 
@@ -37,7 +37,6 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
     config_params.add_argument(
         "--build-type",
         type=str,
-        required=True,
         default="Release",
         metavar="DCMAKE_BUILD_TYPE",
         choices=build_type_choices,
@@ -67,6 +66,17 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         formatter_class=help_formatter,
     )
     add_tag_argument(parser=clone_parser, default="repo")
+    
+    insert_dir_parser = subparsers.add_parser(
+        "insert", parents=[setup_parse],
+        help="Insert the contents of a file at the given path.",
+        formatter_class=help_formatter
+    )
+    add_tag_argument(parser=insert_dir_parser, default="filecopy")
+    insert_dir_parser.add_argument(
+        "--path", "-p", type=str, required=True,
+        help='The path to be copied to the image.'
+    )
 
     config_parser = subparsers.add_parser(
         "config",
@@ -162,6 +172,8 @@ def run_build(args: argparse.Namespace, command: str) -> None:
         build_all(**vars(args))
     elif command == "clone":
         clone(**vars(args))
+    elif command == "insert":
+        insert(**vars(args))
     elif command == "config":
         configure(**vars(args))
     elif command == "compile":

@@ -5,7 +5,8 @@ import re
 from pathlib import Path
 from shlex import split
 from subprocess import DEVNULL, PIPE, run
-from typing import Dict, Iterable, List
+from textwrap import dedent
+from typing import Dict, Iterable, List, Optional
 
 from ._bind_mount import BindMount
 from ._docker_cmake import (
@@ -70,9 +71,77 @@ def clone(
 
     dockerfile = f"FROM {base}\n\n{body}"
 
+    prefix = universal_tag_prefix()folder_name
+    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
+
+    body, header = git_clone_dockerfile(
+        git_repo=repo,
+        repo_branch=branch,
+        repo_name=repo_name
+    )
+
+    dockerfile = f"{header}\n\nFROM {base}\n\n{body}"
+
+    return Image.build(
+        tag=img_tag,
+        dockerfile_string=dockerfile,
+        no_cache=True
+    )
+
+folder_name
+def insert(tag: str, base: str, path: str):
+    """
+    Builds a docker image with the contents of the given path copied onto it.
+
+    The directory path on the image has the same name as the topmost directory
+    of the given path. e.g. giving path "/tmp/dir/subdir" will result in the contents of
+    this path being saved in "/subdir" on the generated image.
+
+    Parameters
+    ----------
+    tag : str
+        The image tag.
+    base : str
+        The base image tag.
+    path : str
+        The path to be copied.
+
+    Returns
+    -------
+    Image
+        The generated image.
+    """
+
     prefix = universal_tag_prefix()
     img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
+
+    # The absolute path of the given file will be the build context.
+    # This is necessary because otherwise docker may be unable to find the files.
+    path_absolute = os.path.abspath(path)
+    # Additionally, the top directory of the given path will be the name of the
+    # directory in the image.
+    if os.path.isdir(path):
+        target_dir = os.path.basename(path_absolute)
+    else:
+        target_dir = os.path.basename(os.path.dirname(path_absolute))
+
+    # This dockerfile is very simple, we can make it right here.
+    dockerfile = dedent(f"""
+        FROM {base}
+
+        COPY --chown=$DEFAULT_GID:$DEFAULT_UID --chmod=755 . "/{target_dir}/"
+
+        WORKDIR "/{target_dir}"
+        USER $DEFAULT_USER
+        """).strip()
+
+    # Build the image with the context at the absolute path of the given path.
+    return Image.build(
+        tag=img_tag,
+        context=path_absolute,
+        dockerfile_string=dockerfile,
+        no_cache=True
+    )
 
 
 def configure(tag: str, base: str, build_type: str, no_cuda: bool) -> Image:
@@ -169,7 +238,8 @@ def install(tag: str, base: str) -> Image:
 def full_compile(
     tag: str,
     base: str,
-    repo: str,
+    copy_path: str,
+    repo: Optional[str],
     build_type: str,
     no_cuda: bool,
     branch: str = ""
@@ -183,6 +253,8 @@ def full_compile(
         The image tag prefix.
     base : str
         The base image tag.
+    copy_path : str
+        The path to be copied. If used, no repo will be downloaded.
     repo : str
         The name of the Git repo, in [USER]/[REPO_NAME] format
     build_type : str
@@ -201,13 +273,44 @@ def full_compile(
 
     images: Dict[str, Image] = {}
 
-    git_repo_tag = f"{prefix}-{tag}-git-repo"
-    git_repo_image = clone(base=base, tag=git_repo_tag, repo=repo, branch=branch)
-    images[git_repo_tag] = git_repo_image
+    # If the user has indicated a path to copy, the code should copy that.
+    # Otherwise, the code should fetch a git repository.
+    is_insert = copy_path is not None
+
+    initial_tag: str = ""
+    if is_insert:
+        path_absolute = os.path.abspath(copy_path)
+        if os.path.isdir(copy_path):
+            top_dir = os.path.basename(path_absolute)
+        else:
+            top_dir = os.path.basename(os.path.dirname(path_absolute))
+
+        insert_tag = f"{prefix}-{tag}-file-{top_dir}"
+        insert_image = insert(
+            base=base,
+            tag=insert_tag,
+            path=copy_path
+        )
+        images[insert_tag] = insert_image
+        initial_tag = insert_tag
+    else:
+        git_repo_tag = f"{prefix}-{tag}-git-repo"
+        assert repo is not None
+        git_repo_image = clone(
+            base=base,
+            tag=git_repo_tag,
+            repo=repo,
+            branch=branch
+        )
+        images[git_repo_tag] = git_repo_image
+        initial_tag = git_repo_tag
 
     configure_tag = f"{prefix}-{tag}-configured"
     configure_image = configure(
-        tag=configure_tag, base=git_repo_tag, build_type=build_type, no_cuda=no_cuda
+        tag=configure_tag,
+        base=initial_tag,
+        build_type=build_type,
+        no_cuda=no_cuda
     )
     images[configure_tag] = configure_image
 

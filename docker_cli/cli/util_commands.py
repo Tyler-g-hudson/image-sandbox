@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 
-from ..commands import dropin, make_lockfile, remove
+from ..commands import dropin, make_lockfile, remove, test
 from ._utils import help_formatter
 
 
@@ -93,3 +93,5 @@ def run_util(args: argparse.Namespace, command: str) -> None:
         remove(**vars(args))
     elif command == "lockfile":
         make_lockfile(**vars(args))
+    elif command == "test":
+        test(**vars(args))
