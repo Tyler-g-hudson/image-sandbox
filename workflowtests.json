@@ -229,32 +229,32 @@
         "series": [
           {
             "workflow": "rslc",
-            "tag": "ref",
+            "label": "ref",
             "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml"
           },
           {
             "workflow": "rslc",
-            "tag": "sec",
+            "label": "sec",
             "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml"
           },
           {
             "workflow": "gslc",
-            "tag": "ref",
+            "label": "ref",
             "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml"
           },
           {
             "workflow": "gslc",
-            "tag": "sec",
+            "label": "sec",
             "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml"
           },
           {
             "workflow": "gcov",
-            "tag": "ref",
+            "label": "ref",
             "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_ref.yaml"
           },
           {
             "workflow": "gcov",
-            "tag": "sec",
+            "label": "sec",
             "runconfig": "ALPSRP262866750_ALPSRP269576750_Chile_sec.yaml"
           },
           {
@@ -272,32 +272,32 @@
         "series": [
           {
             "workflow": "rslc",
-            "tag": "ref",
+            "label": "ref",
             "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml"
           },
           {
             "workflow": "rslc",
-            "tag": "sec",
+            "label": "sec",
             "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml"
           },
           {
             "workflow": "gslc",
-            "tag": "ref",
+            "label": "ref",
             "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml"
           },
           {
             "workflow": "gslc",
-            "tag": "sec",
+            "label": "sec",
             "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml"
           },
           {
             "workflow": "gcov",
-            "tag": "ref",
+            "label": "ref",
             "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_ref.yaml"
           },
           {
             "workflow": "gcov",
-            "tag": "sec",
+            "label": "sec",
             "runconfig": "ALPSRP110160680_ALPSRP116870680_Rosamond_sec.yaml"
           },
           {

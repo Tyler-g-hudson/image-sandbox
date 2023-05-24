@@ -20,10 +20,10 @@ from ._docker_distrib import distrib_dockerfile
 from ._docker_git import git_clone_dockerfile
 from ._docker_mamba import mamba_lockfile_command
 from ._image import Image
-from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
-from ._workflows import (WorkflowParams, get_test_info, run_series_workflow,
-                         run_workflow)
 from ._input_finder import get_input_files_for_test
+from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
+from ._workflows import (WorkflowParams, get_test_info, prepare_scratch_dir,
+                         run_series_workflow, run_workflow, workflow_mounts)
 
 
 def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = False):
@@ -476,52 +476,69 @@ def workflow(
         test_info=test_obj, cache_dirs=cache_dirs, input_dirs=input_dirs
     )
 
-    if test_type == "single":
-        runconfig = test_obj["runconfig"]
-        # Catch if the runconfig field for this test is malformed
-        if not isinstance(runconfig, str):
-            raise ValueError(f"Runconfig value of test {workflow_name}/{test} has type "
-                             f"{type(runconfig)}; expected string.")
+    with prepare_scratch_dir(scratch_dir=scratch_dir) as scratch_dir_absolute:
 
-        print(f"\nRunning workflow test: {workflow_name} {test} on image: "
-              f"{workflow_img.id}\n")
+        if test_type == "single":
 
-        params: WorkflowParams = WorkflowParams(
-            image=workflow_img, image_tag=image, input_dict=input_dir_map,
-            output_dir=output_dir, scratch_dir=scratch_dir
-        )
+            params: WorkflowParams = WorkflowParams(
+                image=workflow_img,
+                image_tag=image,
+                input_dict=input_dir_map,
+                output_dir=Path(output_dir),
+                scratch_dir=scratch_dir_absolute
+            )
 
-        # Run the workflow.
-        run_workflow(
-            test_params=params,
-            workflow_name=workflow_name,
-            test=test,
-            runconfig=runconfig
-        )
+            bind_mounts: List[BindMount] = workflow_mounts(test_params=params)
 
-    # Multitests run in the recursive run_series_workflow function.
-    elif test_type == "multi":
-        # The output directory for multitests is a subdirectory of the given output
-        # directory.
-        multi_test_output_dir = f"{output_dir}/{workflow_name}/{test}"
-        # This is a list of test information dictionaries held under the series workflow
-        series_info = test_obj["series"]
-        assert isinstance(series_info, list)
+            runconfig = test_obj["runconfig"]
+            # Catch if the runconfig field for this test is malformed
+            if not isinstance(runconfig, str):
+                raise ValueError(f"Runconfig value of test {workflow_name}/{test} has "
+                                 f"type {type(runconfig)}; expected string.")
 
-        params = WorkflowParams(
-            image=workflow_img, image_tag=image, input_dict=input_dir_map,
-            output_dir=multi_test_output_dir, scratch_dir=scratch_dir
-        )
+            print(f"\nRunning workflow test: {workflow_name} {test} on image: "
+                  f"{workflow_img.id}\n")
 
-        # This method runs all of the tests in order.
-        run_series_workflow(
-            test_params=params,
-            main_test_name=workflow_name,
-            test_sequence_info=series_info
-        )
+            # Run the workflow.
+            run_workflow(
+                test_params=params,
+                workflow_name=workflow_name,
+                test=test,
+                runconfig=runconfig,
+                basic_mounts=bind_mounts
+            )
 
-    else:
-        raise ValueError(f"Test type {test_type} not recognized.")
+        # Multitests run in the recursive run_series_workflow function.
+        elif test_type == "multi":
+            # The output directory for multitests is a subdirectory of the given output
+            # directory.
+            multi_test_output_dir = Path(output_dir)/workflow_name/test
+            multi_test_scratch_dir = scratch_dir_absolute/workflow_name/test
+            # This is a list of test information dictionaries held under the series
+            # workflow.
+            series_info = test_obj["series"]
+            assert isinstance(series_info, list)
+
+            params = WorkflowParams(
+                image=workflow_img,
+                image_tag=image,
+                input_dict=input_dir_map,
+                output_dir=multi_test_output_dir,
+                scratch_dir=multi_test_scratch_dir
+            )
+
+            bind_mounts = workflow_mounts(test_params=params)
+
+            # This method runs all of the tests in order.
+            run_series_workflow(
+                test_params=params,
+                main_test_name=workflow_name,
+                test_sequence_info=series_info,
+                bind_mounts=bind_mounts
+            )
+
+        else:
+            raise ValueError(f"Test type {test_type} not recognized.")
 
 
 def dropin(tag: str) -> None:
