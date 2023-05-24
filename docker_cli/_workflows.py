@@ -196,27 +196,6 @@ def workflow_mounts(
         )
     ]
 
-    # If requested, add a local mount for the scratch directories.
-    # Otherwise, add a temporary one so the docker container can get rw permissions.
-    temp_scratch: bool = scratch_dir is None
-
-    if temp_scratch:
-        # Create the temp scratch file
-        host_scratch_dir: str = tempfile.mkdtemp()
-    else:
-        assert isinstance(scratch_dir, Path)
-        # Create the scratch file if it doesn't already exist
-        if not os.path.isdir(str(scratch_dir/test_subdir)):
-            os.makedirs(str(scratch_dir/test_subdir))
-        host_scratch_dir = str(scratch_dir.absolute())
-
-    # Create the scratch file bind mount
-    bind_mounts.append(BindMount(
-        image_mount_point=str(install_path/"scratch"/workflow_name),
-        host_mount_point=host_scratch_dir,
-        permissions="rw"
-    ))
-
     # Add the runconfig mount to the install prefix directory
     runconfig_lookup_path: Path = runconfig_path/workflow_name
     # Get the runconfig path on the host and image
@@ -246,6 +225,27 @@ def workflow_mounts(
         ))
 
     try:
+        # If requested, add a local mount for the scratch directories.
+        # Otherwise, add a temporary one so the docker container can get rw permissions.
+        temp_scratch: bool = scratch_dir is None
+
+        if temp_scratch:
+            # Create the temp scratch file
+            host_scratch_dir: str = tempfile.mkdtemp()
+        else:
+            assert isinstance(scratch_dir, Path)
+            # Create the scratch file if it doesn't already exist
+            if not os.path.isdir(str(scratch_dir/test_subdir)):
+                os.makedirs(str(scratch_dir/test_subdir))
+            host_scratch_dir = str(scratch_dir.absolute())
+
+        # Create the scratch file bind mount
+        bind_mounts.append(BindMount(
+            image_mount_point=str(install_path/"scratch"/workflow_name),
+            host_mount_point=host_scratch_dir,
+            permissions="rw"
+        ))
+
         yield bind_mounts
     finally:
         # If a temporary scratch file was created, remove it.
@@ -273,20 +273,6 @@ def run_series_workflow(
     """
     for test_info in test_sequence_info:
         workflow_name = test_info["workflow"]
-        # If the workflow is a series workflow, recurse and run that workflow before
-        # proceeding to the next item.
-        if workflow_name == "series":
-            subseries_info = test_info["series"]
-            run_series_workflow(
-                test_params=test_params,
-                main_test_name=main_test_name,
-                test_sequence_info=subseries_info
-            )
-            continue
-
-        # Parallel tests not implemented yet.
-        if workflow_name == "parallel":
-            raise NotImplementedError("Parallel tests not implemented.")
 
         # Get the location of the runconfig
         runconfig = test_info["runconfig"]
