@@ -23,12 +23,7 @@ from ._image import Image
 from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
 
 
-def clone(
-    tag: str,
-    base: str,
-    repo: str,
-    branch: str = ""
-):
+def clone(tag: str, base: str, repo: str, branch: str = ""):
     """
     Builds a docker image containing the requested Git repository.
 
@@ -65,30 +60,18 @@ def clone(
     match_dict = github_repo_match.groupdict()
     repo_name = match_dict["repo"]
 
-    body: str = git_clone_dockerfile(
-        git_repo=repo, repo_branch=branch, repo_name=repo_name
-    )
-
-    dockerfile = f"FROM {base}\n\n{body}"
-
-    prefix = universal_tag_prefix()folder_name
+    prefix = universal_tag_prefix()
     img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
 
     body, header = git_clone_dockerfile(
-        git_repo=repo,
-        repo_branch=branch,
-        repo_name=repo_name
+        git_repo=repo, repo_branch=branch, folder_name=repo_name
     )
 
     dockerfile = f"{header}\n\nFROM {base}\n\n{body}"
 
-    return Image.build(
-        tag=img_tag,
-        dockerfile_string=dockerfile,
-        no_cache=True
-    )
+    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
 
-folder_name
+
 def insert(tag: str, base: str, path: str):
     """
     Builds a docker image with the contents of the given path copied onto it.
@@ -126,21 +109,20 @@ def insert(tag: str, base: str, path: str):
         target_dir = os.path.basename(os.path.dirname(path_absolute))
 
     # This dockerfile is very simple, we can make it right here.
-    dockerfile = dedent(f"""
+    dockerfile = dedent(
+        f"""
         FROM {base}
 
         COPY --chown=$DEFAULT_GID:$DEFAULT_UID --chmod=755 . "/{target_dir}/"
 
         WORKDIR "/{target_dir}"
         USER $DEFAULT_USER
-        """).strip()
+        """
+    ).strip()
 
     # Build the image with the context at the absolute path of the given path.
     return Image.build(
-        tag=img_tag,
-        context=path_absolute,
-        dockerfile_string=dockerfile,
-        no_cache=True
+        tag=img_tag, context=path_absolute, dockerfile_string=dockerfile, no_cache=True
     )
 
 
@@ -235,14 +217,14 @@ def install(tag: str, base: str) -> Image:
     return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
 
 
-def full_compile(
+def build_all(
     tag: str,
     base: str,
     copy_path: str,
     repo: Optional[str],
     build_type: str,
     no_cuda: bool,
-    branch: str = ""
+    branch: str = "",
 ) -> Dict[str, Image]:
     """
     Fully compiles and builds a Git repo with cmake.
@@ -286,31 +268,19 @@ def full_compile(
             top_dir = os.path.basename(os.path.dirname(path_absolute))
 
         insert_tag = f"{prefix}-{tag}-file-{top_dir}"
-        insert_image = insert(
-            base=base,
-            tag=insert_tag,
-            path=copy_path
-        )
+        insert_image = insert(base=base, tag=insert_tag, path=copy_path)
         images[insert_tag] = insert_image
         initial_tag = insert_tag
     else:
         git_repo_tag = f"{prefix}-{tag}-git-repo"
         assert repo is not None
-        git_repo_image = clone(
-            base=base,
-            tag=git_repo_tag,
-            repo=repo,
-            branch=branch
-        )
+        git_repo_image = clone(base=base, tag=git_repo_tag, repo=repo, branch=branch)
         images[git_repo_tag] = git_repo_image
         initial_tag = git_repo_tag
 
     configure_tag = f"{prefix}-{tag}-configured"
     configure_image = configure(
-        tag=configure_tag,
-        base=initial_tag,
-        build_type=build_type,
-        no_cuda=no_cuda
+        tag=configure_tag, base=initial_tag, build_type=build_type, no_cuda=no_cuda
     )
     images[configure_tag] = configure_image
 

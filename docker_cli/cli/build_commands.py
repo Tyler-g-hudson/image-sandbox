@@ -1,7 +1,15 @@
 import argparse
 from typing import List
 
-from ..commands import build_all, clone, compile, configure, distributable, insert, install
+from ..commands import (
+    build_all,
+    clone,
+    compile,
+    configure,
+    distributable,
+    insert,
+    install,
+)
 from ._utils import add_tag_argument, help_formatter
 
 
@@ -66,16 +74,20 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         formatter_class=help_formatter,
     )
     add_tag_argument(parser=clone_parser, default="repo")
-    
+
     insert_dir_parser = subparsers.add_parser(
-        "insert", parents=[setup_parse],
+        "insert",
+        parents=[setup_parse],
         help="Insert the contents of a file at the given path.",
-        formatter_class=help_formatter
+        formatter_class=help_formatter,
     )
     add_tag_argument(parser=insert_dir_parser, default="filecopy")
     insert_dir_parser.add_argument(
-        "--path", "-p", type=str, required=True,
-        help='The path to be copied to the image.'
+        "--path",
+        "-p",
+        type=str,
+        required=True,
+        help="The path to be copied to the image.",
     )
 
     config_parser = subparsers.add_parser(

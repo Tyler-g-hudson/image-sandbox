@@ -8,7 +8,7 @@ def git_clone_dockerfile(
     git_repo: str,
     repo_branch: str = "",
     git_url: str = "https://github.com",
-    folder_name: str = "repo"
+    folder_name: str = "repo",
 ) -> Tuple[str, str]:
     """_summary_
 
@@ -40,26 +40,36 @@ def git_clone_dockerfile(
 
     # Dockerfile preparation:
     # Prepare the repository file, ensure proper ownership and permissions.
-    body = dedent(f"""
+    body = (
+        dedent(
+            f"""
         USER root
 
         RUN mkdir /{folder_name}
         RUN chown -R $MAMBA_USER_ID:$MAMBA_USER_GID /{folder_name}
         RUN chmod -R 755 /{folder_name}
 
-    """).strip() + "\n"
+    """
+        ).strip()
+        + "\n"
+    )
 
     # Activate Micromamba
     body += micromamba_docker_lines() + "\n"
 
     # Add the git repo, move workdir to it, and change user back to default
-    body += dedent(f"""
+    body += (
+        dedent(
+            f"""
         ADD {git_url}/{git_repo}.git /{folder_name}/
         # RUN {' '. join(instruction)}
 
         WORKDIR /{folder_name}/
         USER $DEFAULT_USER
-    """).strip() + "\n"
+    """
+        ).strip()
+        + "\n"
+    )
 
     # Return the generated body plus a header
     return body, "# syntax=docker/dockerfile:1-labs"
