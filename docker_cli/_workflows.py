@@ -408,10 +408,6 @@ def run_workflow(
         workflow_name=workflow_name, test=test, test_params=test_params
     )
 
-    for mount in mounts:
-        print(mount.mount_string())
-    print()
-
     # Run the test on the image.
     try:
         test_params.image.run(command, bind_mounts=mounts, host_user=True)
