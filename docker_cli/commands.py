@@ -120,7 +120,7 @@ def insert(tag: str, base: str, path: str, no_cache: bool = False):
         f"""
         FROM {base}
 
-        COPY --chown=$DEFAULT_GID:$DEFAULT_UID --chmod=755 . "/{target_dir}/"
+        COPY --chown=$DEFAULT_GID:$DEFAULT_UID --chmod=777 . "/{target_dir}/"
 
         WORKDIR "/{target_dir}"
         USER $DEFAULT_USER

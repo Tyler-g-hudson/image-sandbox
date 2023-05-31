@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import os
 import threading
@@ -7,6 +9,7 @@ from typing import Dict, Iterable, List
 
 from ._bind_mount import BindMount
 from ._image import Image
+from ._exceptions import ImageNotFoundError
 from ._search import filtered_file_search, names_only_search, search_file
 
 
@@ -16,7 +19,7 @@ def data_search(
     names: Iterable[str],
     fields: Iterable[str],
     all: bool = False,
-) -> List[Dict[str, Union[str, Dict[str, str]]]]:
+) -> List[Dict[str, str | Dict[str, str]]]:
     """
     Query a file database for items.
 
@@ -123,7 +126,11 @@ def data_fetch(
     verbose_stderr : bool, optional
         If true, suppress stderr output during fetch. Defaults to False.
     """
-    rover_image = Image("rover")
+    try:
+        rover_image = Image("rover")
+    except ImageNotFoundError:
+        print("\nRover image not found. Pulling from docker.io:")
+        rover_image = _deploy_rover()
     image_mount_loc = rover_image.run(
         command="echo $MOUNT_LOCATION", stdout=PIPE
     ).strip()
@@ -151,6 +158,8 @@ def data_fetch(
     # Construct the set of tasks to fetch each data item.
     tasks: List[threading.Thread] = []
 
+    print("Fetching data repositories:")
+
     for data_item in data_values:
         tasks.append(
             threading.Thread(
@@ -160,6 +169,7 @@ def data_fetch(
             )
         )
 
+    print()
     # Begin performing each of the fetch tasks.
     for task in tasks:
         task.start()
@@ -230,3 +240,30 @@ def _request_data_item(
     rover_image.run(
         command=command, host_user=True, bind_mounts=[mount_point], stderr=stderr
     )
+
+
+def _deploy_rover() -> Image:
+    """
+    Acquires and deploys the Rover image from dockerhub.
+
+    ..note:
+        While it isn't typical, there may be some bugged updates to docker that cause
+        this to require a dockerhub login. The rover image is public so it shouldn't
+
+    Returns
+    -------
+    Image
+        The Rover image.
+    """
+    cmd = ["docker", "pull", "tylerghudson/rover:latest"]
+    run(cmd)
+    print("\nAssigning tag name to Rover image.")
+    cmd = ["docker", "tag", "docker.io/tylerghudson/rover:latest", "rover"]
+    run(cmd)
+    print("Removing docker.io image tag to avoid tag clutter:")
+    cmd = ["docker", "rmi", "docker.io/tylerghudson/rover"]
+    run(cmd)
+    print()
+
+    image: Image = Image("rover")
+    return image

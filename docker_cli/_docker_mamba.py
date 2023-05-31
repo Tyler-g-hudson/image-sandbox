@@ -50,6 +50,28 @@ def mamba_add_reqs_dockerfile(
     )
 
 
+def mamba_add_packages_dockerfile(
+    packages: Iterable[str],
+    channels: Iterable[str] | None
+) -> str:
+    """
+    Creates a dockerfile body for adding the given packages to a micromamba environment.
+
+    Parameters
+    ----------
+    packages : Iterable[str]
+        The set of packages to be added to the environment.
+    channels: Iterable[str], optional
+        Channels to look for packages in.
+
+    Returns
+    -------
+    str
+        The dockerfile body.
+    """
+    return _mamba_reqs_command(packages=packages, channels=channels, command="install")
+
+
 def mamba_lockfile_command(
     env_name: str,
 ) -> str:
