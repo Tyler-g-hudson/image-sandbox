@@ -5,9 +5,9 @@ from tempfile import NamedTemporaryFile
 
 from pytest import mark, raises
 
-from docker_cli import CommandNotFoundError, DockerBuildError, Image
-from docker_cli._exceptions import ImageNotFoundError
-from docker_cli._image import get_image_id
+from wigwam import CommandNotFoundError, DockerBuildError, Image
+from wigwam._exceptions import ImageNotFoundError
+from wigwam._image import get_image_id
 
 from .utils import remove_docker_image
 

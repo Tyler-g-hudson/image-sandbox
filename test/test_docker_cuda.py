@@ -2,15 +2,15 @@ from typing import Iterator, Tuple
 
 from pytest import fixture, mark
 
-from docker_cli import Image
-from docker_cli._docker_cuda import (
+from wigwam import Image
+from wigwam._docker_cuda import (
     AptGetCUDADockerfileGen,
     CUDADockerfileGenerator,
     YumCUDADockerfileGen,
     get_cuda_dockerfile_generator,
 )
-from docker_cli._package_manager import AptGet, PackageManager, Yum
-from docker_cli._url_reader import Curl, URLReader, Wget
+from wigwam._package_manager import AptGet, PackageManager, Yum
+from wigwam._url_reader import Curl, URLReader, Wget
 
 from .utils import (
     determine_scope,

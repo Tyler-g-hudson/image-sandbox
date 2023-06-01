@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-from docker_cli.commands import remove
+from wigwam.commands import remove
 
 # This import is necessary for the fixtures to be visible to the test files.
 # Importing fixtures directly into a file can cause some non-trivial problems with

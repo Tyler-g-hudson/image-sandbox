@@ -28,7 +28,7 @@ def universal_tag_prefix() -> str:
     str
         The prefix.
     """
-    return "dcli"
+    return "wigwam"
 
 
 @contextmanager

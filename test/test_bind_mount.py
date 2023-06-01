@@ -1,6 +1,6 @@
 from pytest import raises
 
-from docker_cli._bind_mount import BindMount
+from wigwam._bind_mount import BindMount
 
 
 def test_bind_mount_init():

@@ -32,7 +32,10 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
         formatter_class=help_formatter,
     )
     remove_parser.add_argument(
-        "--force", "-f", action="store_true", help="Force the image removal."
+        "--force", "-f", action="store_true",
+        help=f"Ignore the {prefix} prefix. CAUTION: Using wildcards with this "
+             "argument can result in unintended removal of docker images. Use "
+             "with caution.",
     )
     remove_parser.add_argument(
         "--verbose",
@@ -43,9 +46,10 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
     remove_parser.add_argument(
         "--ignore-prefix",
         action="store_true",
-        help=f"Ignore the {prefix} prefix. CAUTION: Using wildcards with this "
-        "argument can result in unintended removal of Docker images. Use "
-        "with caution.",
+        help=f"An image tag or wildcard. Will be prefixed with \"{prefix}\" "
+             "if not already prefixed. Wildcard characters * and ? should be escaped "
+             "with backslashes as \\* and \\?. Improper use may cause unpredictable "
+             "removal behavior due to shell interpretation of wildcards.",
     )
     remove_parser.add_argument(
         "tags",

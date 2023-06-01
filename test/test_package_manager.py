@@ -2,9 +2,9 @@ from typing import List
 
 from pytest import mark
 
-from docker_cli import Image
-from docker_cli._package_manager import PackageManager
-from docker_cli._utils import _package_manager_check
+from wigwam import Image
+from wigwam._shell_cmds import PackageManager
+from wigwam._utils import _package_manager_check
 
 
 @mark.images

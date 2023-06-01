@@ -3,7 +3,7 @@ from subprocess import CalledProcessError, run
 
 from pytest import mark, raises
 
-from docker_cli import Image
+from wigwam import Image
 
 
 @mark.images

@@ -99,7 +99,7 @@ def data_fetch(
     file: os.PathLike[str] | str,
     tags: Iterable[Iterable[str]],
     names: Iterable[str],
-    mount: os.PathLike[str] | str,
+    cache: os.PathLike[str] | str,
     all: bool = False,
     no_cache: bool = False,
     verbose_stderr: bool = False,
@@ -136,10 +136,10 @@ def data_fetch(
     ).strip()
 
     # Acquire the path of the mount on the host
-    host_mount_path = Path(mount)
+    host_mount_path = Path(cache)
     # If it isn't already a directory, create it
     if not host_mount_path.is_dir():
-        cmd = ["mkdir", "-p", mount]
+        cmd = ["mkdir", "-p", cache]
         run(cmd, check=True)
     host_mount_abspath = host_mount_path.resolve()
 

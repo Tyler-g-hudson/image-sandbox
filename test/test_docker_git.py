@@ -1,4 +1,4 @@
-from docker_cli._docker_git import git_clone_dockerfile
+from wigwam._docker_git import git_clone_dockerfile
 
 from .utils import rough_dockerfile_validity_check
 

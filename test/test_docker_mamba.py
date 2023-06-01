@@ -3,8 +3,8 @@ from typing import Iterator, Tuple
 
 from pytest import fixture, mark
 
-from docker_cli import Image
-from docker_cli._docker_mamba import mamba_add_reqs_dockerfile, mamba_install_dockerfile
+from wigwam import Image
+from wigwam._docker_mamba import mamba_add_reqs_dockerfile, mamba_install_dockerfile
 
 from .utils import (
     determine_scope,
