@@ -2,7 +2,7 @@
 
 # Table of Contents
 
-_**[Functional Overview of WIGWAM](functional-overview-of-wigwam)**_
+_**[Overview of WIGWAM](overview-of-wigwam)**_
 
 _**[Setup & Build Process - The Easy Way](#setup--build-process---the-easy-way)**_
 
@@ -10,11 +10,11 @@ _**[Data Repository Search & Fetch](#data-repository-search--fetch)**_
 
 _**[Running Workflows](#running-workflows)**_
 
-_**[Useful Tools 8](#useful-tools)**_
+_**[Useful Tools](#useful-tools)**_
 
 _**[Advanced Setup & Build Process](#advanced-setup--build-process)**_
 
-# Functional Overview of WIGWAM
+# Overview of WIGWAM
 
 WIGWAM is a python command line interface that enables the rapid and flexible production and management of ISCE3 docker images and artifacts. Its' name stands for:
 
