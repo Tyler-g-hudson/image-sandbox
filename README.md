@@ -2,7 +2,7 @@
 
 # Table of Contents
 
-_**[Overview of WIGWAM](overview-of-wigwam)**_
+_**[Overview of WIGWAM](#overview-of-wigwam)**_
 
 _**[Setup & Build Process - The Easy Way](#setup--build-process---the-easy-way)**_
 
