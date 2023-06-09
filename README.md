@@ -4,7 +4,7 @@
 
 _**[Overview of WIGWAM](#overview-of-wigwam)**_
 
-_**[Setup & Build Process - The Easy Way](#setup--build-process---the-easy-way)**_
+_**[Setup & Build Process](#setup--build-process)**_
 
 _**[Data Repository Search & Fetch](#data-repository-search--fetch)**_
 
@@ -40,7 +40,7 @@ WIGWAM can be used to run single and multi-stage workflow tests for integration 
 
 The semi-nomadic ancestors of modern Algonquin peoples, who inhabited the North Atlantic, Great Lakes, and Upper Mississippi regions of North America, built quickly-constructable, semi-permanent domed or conical structures called Wigwams which acted as spaces for habitation and work at winter hunting camps. These structures were deployed seasonally and would be dismantled and rebuilt if they didn't survive the summer's disuse. It is in this spirit of rapid and flexible deployment that this interface is written and named. The writer of this interface is of Algonquin heritage and uses this name with respect for the ancestral dwelling that it references.
 
-# Setup & Build Process - The Easy Way
+# Setup & Build Process
 
 The WIGWAM interface implements a three-command process for building the ISCE3 deliverable from some base image. The two primary base images supported and tested with this interface are called "ubuntu" and "oraclelinux:8.4" - more generally, WIGWAM may work with images that have either yum or apt-get installed by default and are supported by CUDA's "rhel8" or "ubuntu2004" offerings, but can be guaranteed not to work for any image that does not.
 
