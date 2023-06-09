@@ -5,12 +5,13 @@ import os
 import threading
 from pathlib import Path
 from subprocess import DEVNULL, PIPE, list2cmdline, run
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Sequence
 
 from ._bind_mount import BindMount
 from ._image import Image
 from ._exceptions import ImageNotFoundError
 from ._search import filtered_file_search, names_only_search, search_file
+from ._workflows import get_test_info
 
 
 def data_search(
@@ -96,9 +97,11 @@ def data_names(
 
 
 def data_fetch(
-    file: os.PathLike[str] | str,
     tags: Iterable[Iterable[str]],
     names: Iterable[str],
+    tests: Sequence[str],
+    file: os.PathLike[str] | str,
+    test_file: os.PathLike[str] | str,
     cache: os.PathLike[str] | str,
     all: bool = False,
     no_cache: bool = False,
@@ -109,15 +112,19 @@ def data_fetch(
 
     Parameters
     ----------
-    file : os.PathLike[str]
-        The name of the database file.
     tags : Iterable[Iterable[str]]
         A set of sets of tags - this function will return the union of items that have
         all of any of the sets of tags passed in.
     names : Iterable[str]
         A list of names of data items to return.
+    tests : Sequence[str]
+        A set of tests to collect all of the input data for in WORKFLOW:TEST format.
     mount : os.PathLike[str]
         The location of the cache on the local machine.
+    file : os.PathLike[str]
+        The name of the workflow data database file.
+    test_file : os.PathLike[str]
+        The name of the workflow test database file.
     all : bool, optional
         If true, return all of the items in the database. Defaults to False.
     no_cache : bool, optional
@@ -149,6 +156,36 @@ def data_fetch(
         dst=image_mount_loc,
         permissions="rw",
     )
+
+    test_data: List[str]
+
+    # If tests were requested, acquire the inputs for each.
+    if len(tests) > 0:
+        for test in tests:
+            # Get the workflow name and test name of the test
+            test_terms = test.split(sep=":")
+            if not len(test_terms) == 2:
+                raise ValueError("Test name not given in WORKFLOW:TEST format.")
+            workflow_name, test_name = tuple(test_terms)
+
+            # Get the info about the test from the workflowtest file.
+            test_info, _ = get_test_info(
+                workflow_name=workflow_name,
+                test_name=test_name,
+                filename=str(test_file)
+            )
+
+            # Extract the names of all the inputs from the test info object.
+            test_inputs = test_info["inputs"]
+            if isinstance(test_inputs, str):
+                test_data.append(test_inputs)
+            elif isinstance(test_inputs, dict):
+                test_data += list(test_inputs.values())
+
+    # Make a list of all the unique items between the requested names and the inputs
+    # of the requested tests. This is done by adding the lists together, making a set,
+    # and then converting back to a list.
+    all_names = list(set(list(names) + test_data))
 
     # Find the locations of the data in the database
     data_values = data_search(

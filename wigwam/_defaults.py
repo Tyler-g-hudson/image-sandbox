@@ -25,6 +25,18 @@ def default_workflowdata_path() -> Path:
     return Path("workflowdata.json")
 
 
+def default_workflowtest_path() -> Path:
+    """
+    The default workflowtests.json path
+
+    Returns
+    -------
+    Path
+        A Path object containing the default workflowtests.json path.
+    """
+    return Path("workflowtests.json")
+
+
 def install_prefix() -> str:
     """
     Returns the build system's install prefix.
