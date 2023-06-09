@@ -9,6 +9,7 @@ from textwrap import dedent
 from typing import Dict, Iterable, List, Optional, Sequence
 
 from ._bind_mount import BindMount
+from ._defaults import install_prefix, universal_tag_prefix
 from ._docker_cmake import (
     build_prefix,
     cmake_build_dockerfile,

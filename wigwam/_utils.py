@@ -10,6 +10,7 @@ from subprocess import DEVNULL, CalledProcessError, run
 from threading import Lock
 from typing import Generator, Optional, Tuple
 
+from ._defaults import universal_tag_prefix
 from ._image import Image
 from ._package_manager import (
     PackageManager,

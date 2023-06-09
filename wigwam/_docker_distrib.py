@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from textwrap import dedent
 
-from ._docker_cmake import install_prefix
+from ._defaults import install_prefix
 
 
 def distrib_dockerfile(

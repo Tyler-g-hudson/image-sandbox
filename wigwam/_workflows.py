@@ -13,7 +13,7 @@ from typing import (Any, Dict, Iterator, List, Mapping, Optional, Sequence,
                     Tuple)
 
 from ._bind_mount import BindMount
-from ._docker_cmake import install_prefix
+from ._defaults import install_prefix
 from ._exceptions import TestFailedError
 from ._image import Image
 

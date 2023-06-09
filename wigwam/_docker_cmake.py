@@ -1,5 +1,6 @@
 from textwrap import dedent
 
+from ._defaults import build_prefix, install_prefix
 from ._docker_mamba import micromamba_docker_lines
 
 

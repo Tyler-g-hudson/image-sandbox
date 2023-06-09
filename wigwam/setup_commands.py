@@ -4,6 +4,7 @@ from pathlib import Path
 from textwrap import dedent, indent
 from typing import Dict, Optional, Tuple
 
+from ._defaults import universal_tag_prefix
 from ._docker_cuda import CUDADockerfileGenerator, get_cuda_dockerfile_generator
 from ._docker_mamba import mamba_add_reqs_dockerfile, mamba_install_dockerfile
 from ._image import Image
