@@ -330,7 +330,7 @@ def build_all(
     return images
 
 
-def distributable(tag: str, base: str, source_tag: str) -> Image:
+def distrib(tag: str, base: str, source_tag: str) -> Image:
     """
     Produces a distributable image.
 

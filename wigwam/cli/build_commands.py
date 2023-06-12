@@ -6,7 +6,7 @@ from ..commands import (
     clone,
     compile,
     configure,
-    distributable,
+    distrib,
     insert,
     install,
 )
@@ -203,4 +203,4 @@ def run_build(args: argparse.Namespace, command: str) -> None:
     elif command == "install":
         install(**vars(args))
     elif command == "distrib":
-        distributable(**vars(args))
+        distrib(**vars(args))
