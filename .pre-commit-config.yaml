@@ -17,6 +17,7 @@ repos:
         files: (\.gitignore|requirements.txt)$
       - id: mixed-line-ending
       - id: trailing-whitespace
+        exclude: README.md
 
   - repo: https://github.com/psf/black
     rev: 23.3.0
