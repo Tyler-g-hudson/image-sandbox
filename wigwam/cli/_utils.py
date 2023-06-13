@@ -1,6 +1,6 @@
 import argparse
 
-from .._utils import universal_tag_prefix
+from .._defaults import universal_tag_prefix
 
 
 def add_tag_argument(parser: argparse.ArgumentParser, default: str) -> None:

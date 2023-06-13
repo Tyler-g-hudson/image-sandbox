@@ -2,7 +2,7 @@ import argparse
 import sys
 from typing import Sequence
 
-from .._utils import universal_tag_prefix
+from .._defaults import universal_tag_prefix
 from ._utils import help_formatter
 from .build_commands import build_command_names, init_build_parsers, run_build
 from .data_commands import init_data_parsers, run_data

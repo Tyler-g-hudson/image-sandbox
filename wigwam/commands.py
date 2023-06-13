@@ -9,7 +9,7 @@ from textwrap import dedent
 from typing import Dict, Iterable, List, Optional, Sequence
 
 from ._bind_mount import BindMount
-from ._defaults import install_prefix, universal_tag_prefix
+from ._defaults import install_prefix
 from ._docker_cmake import (
     build_prefix,
     cmake_build_dockerfile,
@@ -20,9 +20,10 @@ from ._docker_cmake import (
 from ._docker_distrib import distrib_dockerfile
 from ._docker_git import git_clone_dockerfile
 from ._docker_mamba import mamba_lockfile_command
+from ._exceptions import ImageNotFoundError
 from ._image import Image
 from ._input_finder import get_input_files_for_test
-from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
+from ._utils import is_conda_pkg_name, prefix_image_tag, test_image
 from ._workflows import (WorkflowParams, get_test_info, prepare_scratch_dir,
                          run_series_workflow, run_workflow, workflow_mounts)
 
@@ -53,6 +54,9 @@ def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = Fal
         The generated image.
     """
 
+    prefixed_tag: str = prefix_image_tag(tag)
+    prefixed_base_tag: str = prefix_image_tag(base)
+
     # Check that the repo pattern matches the given repo string.
     github_repo_pattern = re.compile(
         pattern=r"^(?P<user>[a-zA-Z0-9-]+)\/(?P<repo>[a-zA-Z0-9-]+)$", flags=re.I
@@ -66,16 +70,18 @@ def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = Fal
     match_dict = github_repo_match.groupdict()
     repo_name = match_dict["repo"]
 
-    prefix = universal_tag_prefix()
-    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
-
-    header, body = git_clone_dockerfile(
-        git_repo=repo, repo_branch=branch, folder_name=repo_name
+    dockerfile = git_clone_dockerfile(
+        base=prefixed_base_tag,
+        git_repo=repo,
+        repo_branch=branch,
+        repo_name=repo_name
     )
 
-    dockerfile = f"{header}\n\nFROM {base}\n\n{body}"
-
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=no_cache)
+    return Image.build(
+        tag=prefixed_tag,
+        dockerfile_string=dockerfile,
+        no_cache=no_cache,
+    )
 
 
 def insert(tag: str, base: str, path: str, no_cache: bool = False):
@@ -103,8 +109,8 @@ def insert(tag: str, base: str, path: str, no_cache: bool = False):
         The generated image.
     """
 
-    prefix = universal_tag_prefix()
-    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
+    prefixed_tag: str = prefix_image_tag(tag)
+    prefixed_base_tag: str = prefix_image_tag(base)
 
     # The absolute path of the given file will be the build context.
     # This is necessary because otherwise docker may be unable to find the files.
@@ -117,9 +123,8 @@ def insert(tag: str, base: str, path: str, no_cache: bool = False):
         target_dir = os.path.basename(os.path.dirname(path_absolute))
 
     # This dockerfile is very simple, we can make it right here.
-    dockerfile = dedent(
-        f"""
-        FROM {base}
+    dockerfile = dedent(f"""
+        FROM {prefixed_base_tag}
 
         COPY --chown=$DEFAULT_GID:$DEFAULT_UID --chmod=777 . "/{target_dir}/"
 
@@ -130,7 +135,7 @@ def insert(tag: str, base: str, path: str, no_cache: bool = False):
 
     # Build the image with the context at the absolute path of the given path.
     return Image.build(
-        tag=img_tag,
+        tag=prefixed_tag,
         context=path_absolute,
         dockerfile_string=dockerfile,
         no_cache=no_cache,
@@ -161,15 +166,21 @@ def configure(
     Image
         The generated image.
     """
+
+    prefixed_tag: str = prefix_image_tag(tag)
+    prefixed_base_tag: str = prefix_image_tag(base)
+
     dockerfile: str = cmake_config_dockerfile(
-        base=base,
+        base=prefixed_base_tag,
         build_type=build_type,
-        with_cuda=not no_cuda,
+        with_cuda=not no_cuda
     )
 
-    prefix = universal_tag_prefix()
-    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=no_cache)
+    return Image.build(
+        tag=prefixed_tag,
+        dockerfile_string=dockerfile,
+        no_cache=no_cache,
+    )
 
 
 def compile(tag: str, base: str, no_cache: bool = False) -> Image:
@@ -190,11 +201,17 @@ def compile(tag: str, base: str, no_cache: bool = False) -> Image:
     Image
         The generated image.
     """
-    dockerfile: str = cmake_build_dockerfile(base=base)
 
-    prefix = universal_tag_prefix()
-    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=no_cache)
+    prefixed_tag: str = prefix_image_tag(tag)
+    prefixed_base_tag: str = prefix_image_tag(base)
+
+    dockerfile: str = cmake_build_dockerfile(base=prefixed_base_tag)
+
+    return Image.build(
+        tag=prefixed_tag,
+        dockerfile_string=dockerfile,
+        no_cache=no_cache,
+    )
 
 
 def install(tag: str, base: str, no_cache: bool = False) -> Image:
@@ -218,7 +235,11 @@ def install(tag: str, base: str, no_cache: bool = False) -> Image:
     Image
         The generated image.
     """
-    image: Image = Image(base)
+
+    prefixed_tag: str = prefix_image_tag(tag)
+    prefixed_base_tag: str = prefix_image_tag(base)
+
+    image: Image = Image(prefixed_base_tag)
 
     is_64_bit = test_image(image=image, expression='"$BUILD_PREFIX/lib64"')
 
@@ -227,11 +248,13 @@ def install(tag: str, base: str, no_cache: bool = False) -> Image:
     else:
         lib = "lib"
 
-    dockerfile: str = cmake_install_dockerfile(base=base, ld_lib=lib)
+    dockerfile: str = cmake_install_dockerfile(base=prefixed_base_tag, ld_lib=lib)
 
-    prefix = universal_tag_prefix()
-    img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=no_cache)
+    return Image.build(
+        tag=prefixed_tag,
+        dockerfile_string=dockerfile,
+        no_cache=no_cache,
+    )
 
 
 def build_all(
@@ -271,7 +294,9 @@ def build_all(
     Dict[str, Image]
         A dict of images produced by this process.
     """
-    prefix = universal_tag_prefix()
+
+    prefixed_tag: str = prefix_image_tag(tag)
+    prefixed_base_tag: str = prefix_image_tag(base)
 
     images: Dict[str, Image] = {}
 
@@ -287,9 +312,9 @@ def build_all(
         else:
             top_dir = os.path.basename(os.path.dirname(path_absolute))
 
-        insert_tag = f"{prefix}-{tag}-file-{top_dir}"
+        insert_tag = f"{prefixed_tag}-file-{top_dir}"
         insert_image = insert(
-            base=base,
+            base=prefixed_base_tag,
             tag=insert_tag,
             path=copy_path,
             no_cache=no_cache,
@@ -297,19 +322,19 @@ def build_all(
         images[insert_tag] = insert_image
         initial_tag = insert_tag
     else:
-        git_repo_tag = f"{prefix}-{tag}-git-repo"
+        git_repo_tag = f"{prefixed_tag}-git-repo"
         assert repo is not None
         git_repo_image = clone(
-            base=base,
+            base=prefixed_base_tag,
             tag=git_repo_tag,
             repo=repo,
-            branch=branch,
+            branch=branch
             no_cache=no_cache,
         )
         images[git_repo_tag] = git_repo_image
         initial_tag = git_repo_tag
 
-    configure_tag = f"{prefix}-{tag}-configured"
+    configure_tag = f"{prefixed_tag}-configured"
     configure_image = configure(
         tag=configure_tag,
         base=initial_tag,
@@ -319,12 +344,20 @@ def build_all(
     )
     images[configure_tag] = configure_image
 
-    build_tag = f"{prefix}-{tag}-built"
-    build_image = compile(tag=build_tag, base=configure_tag, no_cache=no_cache)
+    build_tag = f"{prefixed_tag}-built"
+    build_image = compile(
+        tag=build_tag,
+        base=configure_tag,
+        no_cache=no_cache,
+    )
     images[build_tag] = build_image
 
-    install_tag = f"{prefix}-{tag}-installed"
-    install_image = install(tag=install_tag, base=build_tag, no_cache=no_cache)
+    install_tag = f"{prefixed_tag}-installed"
+    install_image = install(
+        tag=install_tag,
+        base=build_tag
+        no_cache=no_cache,
+    )
     images[install_tag] = install_image
 
     return images
@@ -348,6 +381,10 @@ def distrib(tag: str, base: str, source_tag: str) -> Image:
     Image
         The generated image.
     """
+
+    prefixed_base_tag: str = prefix_image_tag(base)
+    prefixed_source_tag: str = prefix_image_tag(source_tag)
+
     base_image: Image = Image(base)
 
     is_64_bit = test_image(image=base_image, expression='"$BUILD_PREFIX/lib64"')
@@ -358,14 +395,18 @@ def distrib(tag: str, base: str, source_tag: str) -> Image:
         lib = "lib"
 
     dockerfile = distrib_dockerfile(
-        base=base,
-        source_tag=source_tag,
+        base=prefixed_base_tag,
+        source_tag=prefixed_source_tag,
         source_path=install_prefix(),
         distrib_path=install_prefix(),
         ld_lib=lib,
     )
 
-    return Image.build(tag=tag, dockerfile_string=dockerfile, no_cache=True)
+    return Image.build(
+        tag=tag,
+        dockerfile_string=dockerfile,
+        no_cache=True
+    )
 
 
 def test(
@@ -388,9 +429,12 @@ def test(
     quiet_fail : bool
         If True, don't output on failure.
     """
+
+    prefixed_tag: str = prefix_image_tag(tag)
+
     host_volume_path = "./Testing/Temps"
     image_volume_path = "/tmp/Testing"
-    image: Image = Image(tag)
+    image: Image = Image(prefixed_tag)
 
     test_cmd = ["(", "ctest"]
 
@@ -461,6 +505,7 @@ def workflow(
     NotImplementedError
         If the test is a multitest.
     """
+
     # Instantiate the Image object to run the workflow on
     workflow_img = Image(image)
 
@@ -551,7 +596,14 @@ def dropin(tag: str) -> None:
     tag : str
         The tag or ID of the image.
     """
-    image: Image = Image(tag)
+
+    prefixed_tag: str = prefix_image_tag(tag)
+
+    try:
+        image: Image = Image(prefixed_tag)
+    except ImageNotFoundError as err:
+        print(f"Error: {str(err)}")
+        exit(1)
 
     image.drop_in()
 
@@ -589,8 +641,7 @@ def remove(
 
     # Search for and delete all images matching each tag or wildcard.
     for tag in tags:
-        prefix = universal_tag_prefix()
-        search = tag if (tag.startswith(prefix) or ignore_prefix) else f"{prefix}-{tag}"
+        search = tag if ignore_prefix else prefix_image_tag(tag)
         if verbose:
             print(f"Attempting removal for tag: {search}")
 
@@ -640,7 +691,8 @@ def make_lockfile(
     lockfile_list: List[str] = lockfile.split("\n")
     conda_package_filter = filter(is_conda_pkg_name, lockfile_list)
     other_lines_filter = filter(
-        lambda line: not is_conda_pkg_name(line) and line != "", lockfile_list
+        lambda line: not is_conda_pkg_name(line) and line != "",
+        lockfile_list
     )
     lockfile_conda_packages: List[str] = list(conda_package_filter)
     lockfile_other_lines: List[str] = list(other_lines_filter)
