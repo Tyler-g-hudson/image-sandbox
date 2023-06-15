@@ -45,12 +45,13 @@ def setup_init(
     with temp_image(base) as temp_img:
         package_mgr, url_reader, dockerfile = image_command_check(temp_img, True)
 
-    dockerfile = (
-        f"FROM {base}\n\n"
-        + dockerfile
-        + "\n"
-        + dedent(
-            """
+    prefixed_tag: str = prefix_image_tag(tag)
+
+    package_mgr, url_reader, dockerfile = image_command_check(
+        base, True
+    )
+
+    dockerfile = f"FROM {base}\n\n" + dockerfile + "\n" + dedent("""
         ENV DEFAULT_GROUP defaultgroup
         ENV DEFAULT_USER defaultuser
         ENV DEFAULT_GID 1000
