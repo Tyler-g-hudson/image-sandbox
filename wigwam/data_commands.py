@@ -157,10 +157,10 @@ def data_fetch(
         permissions="rw",
     )
 
-    test_data: List[str]
+    test_data: List[str] = []
 
     # If tests were requested, acquire the inputs for each.
-    if len(tests) > 0:
+    if tests is not None and len(tests) > 0:
         for test in tests:
             # Get the workflow name and test name of the test
             test_terms = test.split(sep=":")
