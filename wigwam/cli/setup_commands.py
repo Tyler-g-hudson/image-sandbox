@@ -110,6 +110,12 @@ def init_setup_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         default=False,
         help="If used, output informational messages upon completion.",
     )
+    setup_all_parser.add_argument(
+        "--no-cuda",
+        action="store_true",
+        default=False,
+        help="If used, skip CUDA image generation steps.",
+    )
 
     setup_init_parser = setup_subparsers.add_parser(
         "init",

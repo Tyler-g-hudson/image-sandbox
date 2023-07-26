@@ -332,6 +332,7 @@ def setup_all(
     runtime_env_file: Path,
     dev_env_file: Path,
     verbose: bool = False,
+    no_cuda: bool,
 ) -> Dict[str, Image]:
     """
     Builds the entire Docker image stack.
@@ -355,12 +356,15 @@ def setup_all(
         The location of the dev environment requirements file.
     verbose : bool, optional
         If True, output informational messages upon completion. Defaults to False.
+    no_cuda : bool
+        If True, bypass all CUDA install steps.
 
     Returns
     -------
     Dict[str, Image]
         A dictionary of all images generated, indexed by tag.
     """
+    cuda: bool = not no_cuda
 
     prefixed_tag: str = prefix_image_tag(tag)
 
@@ -375,45 +379,54 @@ def setup_all(
     )
     images[base_image_tag] = base_image
 
-    # Build the CUDA runtime image and append it to the image list
-    cuda_run_tag = f"{prefixed_tag}-cuda-{cuda_major}-{cuda_minor}-runtime"
-    cuda_run_image = setup_cuda_runtime(
-        base=base_image_tag,
-        tag=cuda_run_tag,
-        no_cache=no_cache,
-        cuda_version=cuda_version,
-        cuda_repo=cuda_repo,
-        package_manager=package_mgr,
-        url_reader=url_program,
-    )
-    images[cuda_run_tag] = cuda_run_image
+    if cuda:
+        # Build the CUDA runtime image and append it to the image list
+        cuda_run_tag = f"{prefixed_tag}-cuda-" + \
+            f"{cuda_major}-{cuda_minor}-runtime"
+        cuda_run_image = setup_cuda_runtime(
+            base=base_image_tag,
+            tag=cuda_run_tag,
+            no_cache=no_cache,
+            cuda_version=cuda_version,
+            cuda_repo=cuda_repo,
+            package_manager=package_mgr,
+            url_reader=url_program
+        )
+        images[cuda_run_tag] = cuda_run_image
+        mamba_run_base = cuda_run_tag
+    else:
+        mamba_run_base = base_image_tag
 
     # Build the Mamba runtime image and append it to the image list
     mamba_run_tag = f"{prefixed_tag}-mamba-runtime"
     mamba_run_image = setup_conda_runtime(
-        base=cuda_run_tag,
+        base=mamba_run_base,
         tag=mamba_run_tag,
         no_cache=no_cache,
         env_file=runtime_env_file,
     )
     images[mamba_run_tag] = mamba_run_image
 
-    # Build the CUDA dev image and append it to the image list
-    cuda_dev_tag = f"{prefixed_tag}-cuda-{cuda_major}-{cuda_minor}-dev"
-    cuda_dev_image = setup_cuda_dev(
-        base=mamba_run_tag,
-        tag=cuda_dev_tag,
-        no_cache=no_cache,
-        cuda_version=cuda_version,
-        package_manager=package_mgr,
-        url_reader=url_program,
-    )
-    images[cuda_dev_tag] = cuda_dev_image
+    if cuda:
+        # Build the CUDA dev image and append it to the image list
+        cuda_dev_tag = f"{prefixed_tag}-cuda-" + \
+            f"{cuda_major}-{cuda_minor}-dev"
+        cuda_dev_image = setup_cuda_dev(
+            base=mamba_run_tag,
+            tag=cuda_dev_tag,
+            no_cache=no_cache,
+            package_manager=package_mgr,
+            url_reader=url_program
+        )
+        images[cuda_dev_tag] = cuda_dev_image
+        mamba_dev_base = cuda_dev_tag
+    else:
+        mamba_dev_base = mamba_run_tag
 
     # Build the Mamba dev image and append it to the image list
     mamba_dev_tag = f"{prefixed_tag}-mamba-dev"
     mamba_dev_image = setup_conda_dev(
-        base=cuda_dev_tag,
+        base=mamba_dev_base,
         tag=mamba_dev_tag,
         no_cache=no_cache,
         env_file=dev_env_file
