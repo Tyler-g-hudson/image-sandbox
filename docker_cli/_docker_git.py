@@ -25,10 +25,10 @@ def git_clone_dockerfile(
 
     Returns
     -------
-    body : str
-        The generated dockerfile body.
     header : str
         The generated dockerfile header.
+    body : str
+        The generated dockerfile body.
     """
 
     instruction: Iterable[str] = git_clone_command(
@@ -71,8 +71,9 @@ def git_clone_dockerfile(
         + "\n"
     )
 
+    header = "# syntax=docker/dockerfile:1-labs"
     # Return the generated body plus a header
-    return body, "# syntax=docker/dockerfile:1-labs"
+    return header, body
 
 
 def git_clone_command(

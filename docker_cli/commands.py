@@ -63,7 +63,7 @@ def clone(tag: str, base: str, repo: str, branch: str = ""):
     prefix = universal_tag_prefix()
     img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
 
-    body, header = git_clone_dockerfile(
+    header, body = git_clone_dockerfile(
         git_repo=repo, repo_branch=branch, folder_name=repo_name
     )
 
