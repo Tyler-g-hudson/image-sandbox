@@ -8,7 +8,7 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 def get_input_files_for_test(
     test_info: Mapping[str, str | Sequence[Mapping[str, str]] | Mapping[str, str]],
     cache_dirs: Sequence[str],
-    input_dirs: Optional[Sequence[str]] = None
+    input_dirs: Optional[Sequence[str]] = None,
 ) -> Dict[str, Path]:
     """
     Associates the input repositories needed by a given test with their locations.
@@ -42,7 +42,7 @@ def get_input_files_for_test(
         required_repositories=req_repos,
         label_repo_dict=label_repo_dict,
         cache_dirs=cache_dirs,
-        input_dirs=labels_to_dirs
+        input_dirs=labels_to_dirs,
     )
 
     return inputs_to_paths
@@ -52,7 +52,7 @@ def search_for_inputs(
     required_repositories: Sequence[str],
     label_repo_dict: Mapping[str, str],
     cache_dirs: Sequence[os.PathLike[str] | str],
-    input_dirs: Optional[str | Mapping[str, os.PathLike[str] | str]] = None
+    input_dirs: Optional[str | Mapping[str, os.PathLike[str] | str]] = None,
 ) -> Dict[str, Path]:
     """
     Finds the locations of all needed input repositories.
@@ -84,8 +84,9 @@ def search_for_inputs(
     if isinstance(input_dirs, str):
         if len(required_repositories) == 1:
             return {required_repositories[0]: Path(input_dirs)}
-        raise ValueError("Unlabeled input directories only allowed for tests with "
-                         "only one input.")
+        raise ValueError(
+            "Unlabeled input directories only allowed for tests with " "only one input."
+        )
 
     # The dictionary to be output: Maps repositories to their paths.
     inputs_to_paths: Dict[str, Path] = {}
@@ -97,14 +98,13 @@ def search_for_inputs(
     if input_dirs is not None:
         # A list of the paths provided by the user, to be checked to ensure values that
         # are passed are all used.
-        unmatched_input_dir_paths: List[os.PathLike[str] | str] = \
-            list(input_dirs.values())
+        unmatched_input_dir_paths: List[os.PathLike[str] | str] = list(
+            input_dirs.values()
+        )
 
         # Check the user's provided labels for validity.
         accepted_labels = list(
-            filter(
-                lambda label: _in_labels(label_repo_dict, label), input_dirs.keys()
-            )
+            filter(lambda label: _in_labels(label_repo_dict, label), input_dirs.keys())
         )
 
         # For all of the labels identified, update the output dict and other lists.
@@ -120,17 +120,17 @@ def search_for_inputs(
         # If the user provided more input directory paths than requested, this is an
         # error.
         if len(unmatched_input_dir_paths) > 0:
-            raise ValueError("Supplied input directory was not matched to a label or "
-                             "repository name.")
+            raise ValueError(
+                "Supplied input directory was not matched to a label or "
+                "repository name."
+            )
 
     # Search in the cache dirs for the given repo names.
     for cache_dir in cache_dirs:
         # Find all repos in this cache dir that are in the unmached_repositories list
         # and record their location.
         found_repos = list(
-            filter(
-                lambda repo: (_in_cache(cache_dir, repo)), unmatched_repositories
-            )
+            filter(lambda repo: (_in_cache(cache_dir, repo)), unmatched_repositories)
         )
         for repo in found_repos:
             unmatched_repositories.remove(repo)
@@ -142,16 +142,15 @@ def search_for_inputs(
     # Check to see if repositories were not found. If so, error.
     if len(unmatched_repositories) > 0:
         unmatched_repositories_str = ", ".join(unmatched_repositories)
-        raise ValueError(f"Required repositories not found in supplied locations: "
-                         f"{unmatched_repositories_str}")
+        raise ValueError(
+            f"Required repositories not found in supplied locations: "
+            f"{unmatched_repositories_str}"
+        )
 
     return inputs_to_paths
 
 
-def _in_labels(
-    labeled_dict: Mapping[str, str],
-    label: str
-) -> bool:
+def _in_labels(labeled_dict: Mapping[str, str], label: str) -> bool:
     """
     Determines if a label is in a labeled dict. Errors if not.
 
@@ -178,10 +177,7 @@ def _in_labels(
     return True
 
 
-def _in_cache(
-    cache_dir: os.PathLike[str] | str,
-    repo_name: str
-) -> bool:
+def _in_cache(cache_dir: os.PathLike[str] | str, repo_name: str) -> bool:
     """
     Determines if a repository directory is in a given cache.
 
@@ -247,7 +243,7 @@ def generate_search_tables(
 
 
 def input_dict_parse(
-    kvp_strings: Sequence[str]
+    kvp_strings: Sequence[str],
 ) -> Dict[str, os.PathLike[str] | str] | str:
     """
     Splits a set of strings into key-value pairs in a dictionary.
@@ -281,8 +277,10 @@ def input_dict_parse(
                 # be appeased upon the day of my pre-commit.
                 assert isinstance(value, str)
                 return value
-            ValueError("Unlabeled input directories only allowed for tests with only "
-                       "one input.")
+            ValueError(
+                "Unlabeled input directories only allowed for tests with only "
+                "one input."
+            )
         ret_dict[key] = value
 
     return ret_dict

@@ -10,13 +10,13 @@ class BindMount:
 
     src: str | os.PathLike[str]
     """
-    str or os.PathLike[str] :
+    str or path-like :
         The path to the file or directory on the Docker daemon host.
     """
 
     dst: str | os.PathLike[str]
     """
-    str or os.PathLike[str] :
+    str or path-like :
         The path where the file or directory is mounted in the container.
     """
 

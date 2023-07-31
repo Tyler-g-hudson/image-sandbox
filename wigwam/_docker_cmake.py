@@ -4,35 +4,7 @@ from ._defaults import build_prefix, install_prefix
 from ._docker_mamba import micromamba_docker_lines
 
 
-def install_prefix() -> str:
-    """
-    Returns the build system's install prefix.
-
-    Returns
-    -------
-    str
-        The install prefix.
-    """
-    return "/app"
-
-
-def build_prefix() -> str:
-    """
-    Returns the build system's build prefix.
-
-    Returns
-    -------
-    str
-        The build prefix.
-    """
-    return "/tmp/build"
-
-
-def cmake_config_dockerfile(
-    base: str,
-    build_type: str,
-    with_cuda: bool = True,
-) -> str:
+def cmake_config_dockerfile(base: str, build_type: str, with_cuda: bool = True) -> str:
     """
     Creates a dockerfile for configuring CMAKE.
 

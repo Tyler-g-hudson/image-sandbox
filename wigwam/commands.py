@@ -15,17 +15,21 @@ from ._docker_cmake import (
     cmake_build_dockerfile,
     cmake_config_dockerfile,
     cmake_install_dockerfile,
-    install_prefix,
 )
 from ._docker_distrib import distrib_dockerfile
 from ._docker_git import git_clone_dockerfile
 from ._docker_mamba import mamba_lockfile_command
-from ._exceptions import ImageNotFoundError
 from ._image import Image
 from ._input_finder import get_input_files_for_test
-from ._utils import is_conda_pkg_name, prefix_image_tag, test_image
-from ._workflows import (WorkflowParams, get_test_info, prepare_scratch_dir,
-                         run_series_workflow, run_workflow, workflow_mounts)
+from ._utils import is_conda_pkg_name, prefix_image_tag, temp_image, test_image
+from ._workflows import (
+    WorkflowParams,
+    get_test_info,
+    prepare_scratch_dir,
+    run_series_workflow,
+    run_workflow,
+    workflow_mounts,
+)
 
 
 def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = False):
@@ -123,7 +127,8 @@ def insert(tag: str, base: str, path: str, no_cache: bool = False):
         target_dir = os.path.basename(os.path.dirname(path_absolute))
 
     # This dockerfile is very simple, we can make it right here.
-    dockerfile = dedent(f"""
+    dockerfile = dedent(
+        f"""
         FROM {prefixed_base_tag}
 
         COPY --chown=$DEFAULT_GID:$DEFAULT_UID --chmod=777 . "/{target_dir}/"
@@ -385,9 +390,8 @@ def distrib(tag: str, base: str, source_tag: str) -> Image:
     prefixed_base_tag: str = prefix_image_tag(base)
     prefixed_source_tag: str = prefix_image_tag(source_tag)
 
-    base_image: Image = Image(base)
-
-    is_64_bit = test_image(image=base_image, expression='"$BUILD_PREFIX/lib64"')
+    with temp_image(base) as temp_img:
+        is_64_bit = test_image(image=temp_img, expression='"$BUILD_PREFIX/lib64"')
 
     if is_64_bit:
         lib = "lib64"
@@ -474,7 +478,7 @@ def workflow(
     cache_dirs: Sequence[str],
     output_dir: str,
     test_file: str,
-    scratch_dir: str
+    scratch_dir: str,
 ) -> None:
     """Runs a workflow test on the given image.
 
@@ -523,15 +527,13 @@ def workflow(
     )
 
     with prepare_scratch_dir(scratch_dir=scratch_dir) as scratch_dir_absolute:
-
         if test_type == "single":
-
             params: WorkflowParams = WorkflowParams(
                 image=workflow_img,
                 image_tag=image,
                 input_dict=input_dir_map,
                 output_dir=Path(output_dir),
-                scratch_dir=scratch_dir_absolute
+                scratch_dir=scratch_dir_absolute,
             )
 
             bind_mounts: List[BindMount] = workflow_mounts(test_params=params)
@@ -539,11 +541,15 @@ def workflow(
             runconfig = test_obj["runconfig"]
             # Catch if the runconfig field for this test is malformed
             if not isinstance(runconfig, str):
-                raise ValueError(f"Runconfig value of test {workflow_name}/{test} has "
-                                 f"type {type(runconfig)}; expected string.")
+                raise ValueError(
+                    f"Runconfig value of test {workflow_name}/{test} has "
+                    f"type {type(runconfig)}; expected string."
+                )
 
-            print(f"\nRunning workflow test: {workflow_name} {test} on image: "
-                  f"{workflow_img.id}\n")
+            print(
+                f"\nRunning workflow test: {workflow_name} {test} on image: "
+                f"{workflow_img.id}\n"
+            )
 
             # Run the workflow.
             run_workflow(
@@ -551,15 +557,15 @@ def workflow(
                 workflow_name=workflow_name,
                 test=test,
                 runconfig=runconfig,
-                basic_mounts=bind_mounts
+                basic_mounts=bind_mounts,
             )
 
         # Multitests run in the recursive run_series_workflow function.
         elif test_type == "multi":
             # The output directory for multitests is a subdirectory of the given output
             # directory.
-            multi_test_output_dir = Path(output_dir)/workflow_name/test
-            multi_test_scratch_dir = scratch_dir_absolute/workflow_name/test
+            multi_test_output_dir = Path(output_dir) / workflow_name / test
+            multi_test_scratch_dir = scratch_dir_absolute / workflow_name / test
             # This is a list of test information dictionaries held under the series
             # workflow.
             series_info = test_obj["series"]
@@ -570,7 +576,7 @@ def workflow(
                 image_tag=image,
                 input_dict=input_dir_map,
                 output_dir=multi_test_output_dir,
-                scratch_dir=multi_test_scratch_dir
+                scratch_dir=multi_test_scratch_dir,
             )
 
             bind_mounts = workflow_mounts(test_params=params)
@@ -580,7 +586,7 @@ def workflow(
                 test_params=params,
                 main_test_name=workflow_name,
                 test_sequence_info=series_info,
-                bind_mounts=bind_mounts
+                bind_mounts=bind_mounts,
             )
 
         else:
@@ -599,12 +605,7 @@ def dropin(tag: str) -> None:
 
     prefixed_tag: str = prefix_image_tag(tag)
 
-    try:
-        image: Image = Image(prefixed_tag)
-    except ImageNotFoundError as err:
-        print(f"Error: {str(err)}")
-        exit(1)
-
+    image: Image = Image(prefixed_tag)
     image.drop_in()
 
 
@@ -691,8 +692,7 @@ def make_lockfile(
     lockfile_list: List[str] = lockfile.split("\n")
     conda_package_filter = filter(is_conda_pkg_name, lockfile_list)
     other_lines_filter = filter(
-        lambda line: not is_conda_pkg_name(line) and line != "",
-        lockfile_list
+        lambda line: not is_conda_pkg_name(line) and line != "", lockfile_list
     )
     lockfile_conda_packages: List[str] = list(conda_package_filter)
     lockfile_other_lines: List[str] = list(other_lines_filter)

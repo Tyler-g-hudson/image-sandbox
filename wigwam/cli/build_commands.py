@@ -1,15 +1,7 @@
 import argparse
 from typing import List
 
-from ..commands import (
-    build_all,
-    clone,
-    compile,
-    configure,
-    distrib,
-    insert,
-    install,
-)
+from ..commands import build_all, clone, compile, configure, distrib, insert, install
 from ._utils import add_tag_argument, help_formatter
 
 

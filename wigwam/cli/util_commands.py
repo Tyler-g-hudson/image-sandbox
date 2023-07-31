@@ -32,10 +32,12 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
         formatter_class=help_formatter,
     )
     remove_parser.add_argument(
-        "--force", "-f", action="store_true",
+        "--force",
+        "-f",
+        action="store_true",
         help=f"Ignore the {prefix} prefix. CAUTION: Using wildcards with this "
-             "argument can result in unintended removal of docker images. Use "
-             "with caution.",
+        "argument can result in unintended removal of docker images. Use "
+        "with caution.",
     )
     remove_parser.add_argument(
         "--verbose",
@@ -46,10 +48,10 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
     remove_parser.add_argument(
         "--ignore-prefix",
         action="store_true",
-        help=f"An image tag or wildcard. Will be prefixed with \"{prefix}\" "
-             "if not already prefixed. Wildcard characters * and ? should be escaped "
-             "with backslashes as \\* and \\?. Improper use may cause unpredictable "
-             "removal behavior due to shell interpretation of wildcards.",
+        help=f'An image tag or wildcard. Will be prefixed with "{prefix}" '
+        "if not already prefixed. Wildcard characters * and ? should be escaped "
+        "with backslashes as \\* and \\?. Improper use may cause unpredictable "
+        "removal behavior due to shell interpretation of wildcards.",
     )
     remove_parser.add_argument(
         "tags",
@@ -90,39 +92,58 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
     workflow_parser = subparsers.add_parser(
         "workflow",
         help="Run workflow tests on an image.",
-        formatter_class=help_formatter)
-    workflow_parser.add_argument(
-        "workflow_name", metavar="WORKFLOW", type=str,
-        help="The name of the workflow."
+        formatter_class=help_formatter,
     )
     workflow_parser.add_argument(
-        "test", metavar="TEST", type=str,
-        help="The name or alias of the test on the given workflow."
+        "workflow_name", metavar="WORKFLOW", type=str, help="The name of the workflow."
     )
     workflow_parser.add_argument(
-        "--image", metavar="IMAGE_TAG", type=str, default="isce3",
-        help="The tag or ID of the image used for testing. Defaults to \"isce3\"."
+        "test",
+        metavar="TEST",
+        type=str,
+        help="The name or alias of the test on the given workflow.",
     )
     workflow_parser.add_argument(
-        "--output-dir", "-o", type=str, required=True,
-        help="The location to mount output files to."
+        "--image",
+        metavar="IMAGE_TAG",
+        type=str,
+        default="isce3",
+        help='The tag or ID of the image used for testing. Defaults to "isce3".',
     )
     workflow_parser.add_argument(
-        "--test-file", type=str, default="workflowtests.json",
-        help="The location of the test info data file. Defaults to workflowtests.json."
+        "--output-dir",
+        "-o",
+        type=str,
+        required=True,
+        help="The location to mount output files to.",
     )
     workflow_parser.add_argument(
-        "--input-dirs", "-i", nargs="+", default=[],
+        "--test-file",
+        type=str,
+        default="workflowtests.json",
+        help="The location of the test info data file. Defaults to workflowtests.json.",
+    )
+    workflow_parser.add_argument(
+        "--input-dirs",
+        "-i",
+        nargs="+",
+        default=[],
         help="The directory of the test input repositories, "
-             "in [PATH] or [LABEL]:[PATH] format."
+        "in [PATH] or [LABEL]:[PATH] format.",
     )
     workflow_parser.add_argument(
-        "--cache-dirs", "-c", nargs="+", default=[],
-        help="The location of a file cache."
+        "--cache-dirs",
+        "-c",
+        nargs="+",
+        default=[],
+        help="The location of a file cache.",
     )
     workflow_parser.add_argument(
-        "--scratch-dir", "-s", type=str, default=None,
-        help="The location to mount scratch files to, if desired."
+        "--scratch-dir",
+        "-s",
+        type=str,
+        default=None,
+        help="The location to mount scratch files to, if desired.",
     )
 
     return

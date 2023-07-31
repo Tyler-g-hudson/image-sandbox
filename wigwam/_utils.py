@@ -20,6 +20,13 @@ from ._package_manager import (
 from ._url_reader import URLReader, get_supported_url_readers, get_url_reader
 
 
+def prefix_image_tag(tag: str):
+    """Prepends the image tag prefix to the tag if it is not already there."""
+    prefix = universal_tag_prefix()
+    prefixed_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
+    return prefixed_tag
+
+
 @contextmanager
 def temp_image(
     base: str,
@@ -84,8 +91,8 @@ def image_command_check(
 
     Parameters
     ----------
-    image: Image
-        The image to test.
+    image: str
+        The tag or id of the image to test.
     configure : bool
         Add configuration commands to the returned string if True. Defaults to False.
 

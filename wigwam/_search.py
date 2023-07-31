@@ -10,7 +10,7 @@ from typing import Dict, Iterable, List, Optional
 def names_only_search(
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: Union[os.PathLike[str], str] = "workflowdata.json",
+    filename: os.PathLike[str] | str = "workflowdata.json",
     all: bool = False,
 ) -> List[str]:
     """
@@ -24,7 +24,7 @@ def names_only_search(
         the union of all items accepted by all inner iterators. Defaults to [].
     names : Iterable[str], optional
         The names to be matched. Defaults to [].
-    filename : str, optional
+    filename : str or path-like, optional
         The name of the file to search. Defaults to "workflowdata.json".
     all : bool, optional
         If True, ignores other options and returns all items in the file.
@@ -50,9 +50,9 @@ def filtered_file_search(
     fields: Iterable[str],
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: Union[os.PathLike[str], str] = "workflowdata.json",
+    filename: os.PathLike[str] | str = "workflowdata.json",
     all: bool = False,
-) -> List[Dict[str, Union[str, Dict[str, str]]]]:
+) -> List[Dict[str, str | Dict[str, str]]]:
     """
     Searches a JSON file, returns accepted items with only the given fields.
 
@@ -66,7 +66,7 @@ def filtered_file_search(
         the union of all items accepted by all inner iterators. Defaults to [].
     names : Iterable[str], optional
         The names to be matched. Defaults to [].
-    filename : str, optional
+    filename : str or path-like, optional
         The name of the file to search. Defaults to "workflowdata.json".
     all : bool, optional
         If True, ignores other options and returns all items in the file.
@@ -95,9 +95,9 @@ def filtered_file_search(
 def search_file(
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: Union[os.PathLike[str], str] = "workflowdata.json",
+    filename: os.PathLike[str] | str = "workflowdata.json",
     all: bool = False,
-) -> List[Dict[str, Union[str, Dict[str, str]]]]:
+) -> List[Dict[str, str | Dict[str, str]]]:
     """
     Return the list of unique objects in a JSON file that have given tags or name.
 
@@ -112,7 +112,7 @@ def search_file(
         the union of all items accepted by all inner iterators. Defaults to [].
     names : Iterable[str], optional
         The names to be matched. Defaults to [].
-    filename : str, optional
+    filename : str or path-like, optional
         The name of the file to search. Defaults to "workflowdata.json".
     all : bool, optional
         If True, ignores other options and returns all items in the file.
@@ -129,7 +129,7 @@ def search_file(
     data: List[Dict[str, str | Dict[str, str]]] = json_dict["data"]
     if all:
         return data
-    items: List[Dict[str, Union[str, Dict[str, str]]]] = list(
+    items: List[Dict[str, str | Dict[str, str]]] = list(
         filter(lambda x: _accept_item(x, tags, names), data)
     )
     return items

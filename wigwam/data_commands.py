@@ -8,8 +8,8 @@ from subprocess import DEVNULL, PIPE, list2cmdline, run
 from typing import Dict, Iterable, List, Sequence
 
 from ._bind_mount import BindMount
-from ._image import Image
 from ._exceptions import ImageNotFoundError
+from ._image import Image
 from ._search import filtered_file_search, names_only_search, search_file
 from ._workflows import get_test_info
 
@@ -172,7 +172,7 @@ def data_fetch(
             test_info, _ = get_test_info(
                 workflow_name=workflow_name,
                 test_name=test_name,
-                filename=str(test_file)
+                filename=str(test_file),
             )
 
             # Extract the names of all the inputs from the test info object.
@@ -189,7 +189,7 @@ def data_fetch(
 
     # Find the locations of the data in the database
     data_values = data_search(
-        file=file, tags=tags, names=names, fields=["name", "url", "files"], all=all
+        file=file, tags=tags, names=all_names, fields=["name", "url", "files"], all=all
     )
 
     # Construct the set of tasks to fetch each data item.

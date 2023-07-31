@@ -9,8 +9,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import (Any, Dict, Iterator, List, Mapping, Optional, Sequence,
-                    Tuple)
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple
 
 from ._bind_mount import BindMount
 from ._defaults import install_prefix
@@ -89,9 +88,7 @@ def get_workflow_object(workflow_name: str) -> Workflow:
 
 
 def get_test_info(
-    workflow_name: str,
-    test_name: str,
-    filename: str = "workflowtests.json"
+    workflow_name: str, test_name: str, filename: str = "workflowtests.json"
 ) -> Tuple[Dict[str, str | List[Dict[str, str]] | Dict[str, str]], str]:
     """
     Get test data from the given file.
@@ -127,8 +124,10 @@ def get_test_info(
         raise ValueError(f"Test {test_name} not found in workflow {workflow_name}")
     test_type = workflow_dict["type"]
     if not isinstance(test_type, str):
-        raise ValueError("\"type\" field of workflow in given test database returned "
-                         f"{type(test_name)}, expected string.")
+        raise ValueError(
+            '"type" field of workflow in given test database returned '
+            f"{type(test_name)}, expected string."
+        )
     return workflow_dict["tests"][test_name], test_type
 
 
@@ -157,36 +156,38 @@ def workflow_mounts(
     # This list will be copied and used for all tests that are run.
     bind_mounts = [
         BindMount(
-            image_mount_point=str(install_path/"output"),
-            host_mount_point=str((output_dir).absolute()),
-            permissions="rw"
+            dst=str(install_path / "output"),
+            src=str((output_dir).absolute()),
+            permissions="rw",
         )
     ]
 
     # Create input files
     for repo in input_dict:
         host_path = input_dict[repo].absolute()
-        image_path = install_path/"input"/repo
-        bind_mounts.append(BindMount(
-            image_mount_point=str(image_path),
-            host_mount_point=str(host_path),
-            permissions="ro"
-        ))
+        image_path = install_path / "input" / repo
+        bind_mounts.append(
+            BindMount(
+                dst=str(image_path),
+                src=str(host_path),
+                permissions="ro",
+            )
+        )
 
     # Create the scratch file bind mount
-    bind_mounts.append(BindMount(
-        image_mount_point=str(install_path/"scratch"),
-        host_mount_point=str(scratch_dir.absolute()),
-        permissions="rw"
-    ))
+    bind_mounts.append(
+        BindMount(
+            dst=str(install_path / "scratch"),
+            src=str(scratch_dir.absolute()),
+            permissions="rw",
+        )
+    )
 
     return bind_mounts
 
 
 @contextmanager
-def prepare_scratch_dir(
-    scratch_dir: Optional[str]
-) -> Iterator[Path]:
+def prepare_scratch_dir(scratch_dir: Optional[str]) -> Iterator[Path]:
     """
     A context manager that returns a scratch directory absolute path.
 
@@ -228,9 +229,7 @@ def prepare_scratch_dir(
 
 
 def prepare_subdirectories(
-    workflow_name: str,
-    test: Optional[str],
-    test_params: WorkflowParams
+    workflow_name: str, test: Optional[str], test_params: WorkflowParams
 ) -> None:
     """
     Generates output and scratch subdirectories for a workflow test.
@@ -244,9 +243,11 @@ def prepare_subdirectories(
     test_params : WorkflowParams
         The test parameters.
     """
-    test_subdir = Path(workflow_name)/test if test is not None else Path(workflow_name)
-    output_dir: Path = test_params.output_dir/test_subdir
-    scratch_dir: Path = test_params.scratch_dir/test_subdir
+    test_subdir = (
+        Path(workflow_name) / test if test is not None else Path(workflow_name)
+    )
+    output_dir: Path = test_params.output_dir / test_subdir
+    scratch_dir: Path = test_params.scratch_dir / test_subdir
 
     # If the output directory doesn't exist on the host, make it.
     if not os.path.isdir(str(output_dir)):
@@ -258,9 +259,7 @@ def prepare_subdirectories(
 
 
 def prepare_runconfig(
-    workflow_name: str,
-    runconfig: str,
-    runconfig_dir: str = "runconfigs"
+    workflow_name: str, runconfig: str, runconfig_dir: str = "runconfigs"
 ) -> BindMount:
     """
     Checks for a local runconfig for a given test and returns a bind mount for it.
@@ -290,10 +289,10 @@ def prepare_runconfig(
     install_path: Path = Path(install_prefix())
 
     # Add the runconfig mount to the install prefix directory
-    runconfig_lookup_path: Path = runconfig_path/workflow_name
+    runconfig_lookup_path: Path = runconfig_path / workflow_name
     # Get the runconfig path on the host and image
-    runconfig_host_path: Path = (runconfig_lookup_path/runconfig).absolute()
-    runconfig_image_path: Path = install_path/runconfig
+    runconfig_host_path: Path = (runconfig_lookup_path / runconfig).absolute()
+    runconfig_image_path: Path = install_path / runconfig
     # If the runconfig doesn't exist at the expected location, this is an error
     if not os.path.isfile(str(runconfig_host_path)):
         raise ValueError(
@@ -302,9 +301,9 @@ def prepare_runconfig(
 
     # Create the runconfig file bind mount
     return BindMount(
-        host_mount_point=str(runconfig_host_path),
-        image_mount_point=str(runconfig_image_path),
-        permissions="ro"
+        src=str(runconfig_host_path),
+        dst=str(runconfig_image_path),
+        permissions="ro",
     )
 
 
@@ -312,7 +311,7 @@ def run_series_workflow(
     test_params: WorkflowParams,
     main_test_name: str,
     test_sequence_info: Sequence[Mapping[str, Any]],
-    bind_mounts: Sequence[BindMount]
+    bind_mounts: Sequence[BindMount],
 ) -> None:
     """
     Run a series of workflow tests in order.
@@ -335,7 +334,7 @@ def run_series_workflow(
 
         # Get the location of the runconfig
         runconfig = test_info["runconfig"]
-        runconfig_path = Path("runconfigs")/main_test_name
+        runconfig_path = Path("runconfigs") / main_test_name
 
         # If the test is tagged, this tag will be a subdirectory under the test
         # directory. This is done by passing "test" into workflow_mounts.
@@ -355,7 +354,7 @@ def run_series_workflow(
             test=test_name,
             basic_mounts=bind_mounts,
             runconfig=runconfig,
-            runconfig_dir=str(runconfig_path)
+            runconfig_dir=str(runconfig_path),
         )
 
 
@@ -365,7 +364,7 @@ def run_workflow(
     test: Optional[str],
     basic_mounts: Sequence[BindMount],
     runconfig: str,
-    runconfig_dir: str = "runconfigs"
+    runconfig_dir: str = "runconfigs",
 ) -> None:
     """
     Runs a workflow test on the given image.
@@ -398,11 +397,13 @@ def run_workflow(
     workflow_obj: Workflow = get_workflow_object(workflow_name=workflow_name)
     command = workflow_obj.get_command(runconfig=runconfig)
 
-    mounts: List[BindMount] = [prepare_runconfig(
-        workflow_name=workflow_name,
-        runconfig=runconfig,
-        runconfig_dir=runconfig_dir
-    )] + list(basic_mounts)
+    mounts: List[BindMount] = [
+        prepare_runconfig(
+            workflow_name=workflow_name,
+            runconfig=runconfig,
+            runconfig_dir=runconfig_dir,
+        )
+    ] + list(basic_mounts)
 
     prepare_subdirectories(
         workflow_name=workflow_name, test=test, test_params=test_params
@@ -412,8 +413,9 @@ def run_workflow(
     try:
         test_params.image.run(command, bind_mounts=mounts, host_user=True)
     except CalledProcessError as err:
-        raise TestFailedError("Workflow test failed with stderr:\n" +
-                              str(err.stderr)) from err
+        raise TestFailedError(
+            "Workflow test failed with stderr:\n" + str(err.stderr)
+        ) from err
 
 
 @dataclass(frozen=True)

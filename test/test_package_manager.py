@@ -3,7 +3,7 @@ from typing import List
 from pytest import mark
 
 from wigwam import Image
-from wigwam._shell_cmds import PackageManager
+from wigwam._package_manager import PackageManager
 from wigwam._utils import _package_manager_check
 
 
