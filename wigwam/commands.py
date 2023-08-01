@@ -6,7 +6,7 @@ from pathlib import Path
 from shlex import split
 from subprocess import DEVNULL, PIPE, run
 from textwrap import dedent
-from typing import Dict, Iterable, List, Optional, Sequence
+from typing import Dict, Iterable, List, Sequence
 
 from ._bind_mount import BindMount
 from ._defaults import install_prefix
@@ -266,7 +266,7 @@ def build_all(
     tag: str,
     base: str,
     copy_path: str,
-    repo: Optional[str],
+    repo: str | None,
     build_type: str,
     no_cuda: bool,
     no_cache: bool = False,
@@ -283,7 +283,7 @@ def build_all(
         The base image tag.
     copy_path : str
         The path to be copied. If used, no repo will be downloaded.
-    repo : str
+    repo : str or None
         The name of the Git repo, in [USER]/[REPO_NAME] format
     build_type : str
         The CMAKE build type
@@ -390,7 +390,7 @@ def distrib(tag: str, base: str, source_tag: str) -> Image:
     prefixed_base_tag: str = prefix_image_tag(base)
     prefixed_source_tag: str = prefix_image_tag(source_tag)
 
-    with temp_image(base) as temp_img:
+    with temp_image(prefixed_base_tag) as temp_img:
         is_64_bit = test_image(image=temp_img, expression='"$BUILD_PREFIX/lib64"')
 
     if is_64_bit:

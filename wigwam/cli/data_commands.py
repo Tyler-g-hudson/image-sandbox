@@ -75,13 +75,13 @@ def init_data_parsers(subparsers: argparse._SubParsersAction) -> None:
         formatter_class=help_formatter,
     )
     fetch_parser.add_argument(
-        "--mount",
-        "-m",
+        "--cache",
+        "-c",
         type=str,
-        default="./mount",
-        metavar="MOUNT_LOCATION",
+        default="./cache",
+        metavar="CACHE_LOCATION",
         required=True,
-        help="The location to mount the repository to.",
+        help="The location of the data cache.",
     )
     fetch_parser.add_argument(
         "--no-cache",
