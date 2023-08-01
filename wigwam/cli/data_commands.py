@@ -1,5 +1,7 @@
 import argparse
+from pathlib import Path
 
+from .._defaults import default_workflowdata_path, default_workflowtest_path
 from ..data_commands import data_fetch, data_search
 from ._utils import help_formatter
 
@@ -17,10 +19,10 @@ def init_data_parsers(subparsers: argparse._SubParsersAction) -> None:
     """
     search_params = argparse.ArgumentParser(add_help=False)
     search_params.add_argument(
-        "--file",
+        "--data-file",
         "-f",
-        type=str,
-        default="workflowdata.json",
+        type=Path,
+        default=default_workflowdata_path(),
         metavar="FILENAME",
         help="The filename of the repository metadata file.",
     )
@@ -75,13 +77,26 @@ def init_data_parsers(subparsers: argparse._SubParsersAction) -> None:
         formatter_class=help_formatter,
     )
     fetch_parser.add_argument(
+        "--tests",
+        nargs="+",
+        metavar="WORKFLOW:TEST",
+        help="A set of tests to download the inputs for.",
+    )
+    fetch_parser.add_argument(
+        "--test_file",
+        type=Path,
+        default=default_workflowtest_path(),
+        metavar="TEST_FILE",
+        help="The location of the workflow test description file.",
+    )
+    fetch_parser.add_argument(
         "--cache",
         "-c",
-        type=str,
-        default="./cache",
+        type=Path,
+        default=Path("./cache"),
         metavar="CACHE_LOCATION",
         required=True,
-        help="The location of the data cache.",
+        help="The location to cache the repository to.",
     )
     fetch_parser.add_argument(
         "--no-cache",

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 import threading
 from pathlib import Path
 from subprocess import DEVNULL, PIPE, list2cmdline, run
@@ -15,18 +14,19 @@ from ._workflows import get_test_info
 
 
 def data_search(
-    file: os.PathLike[str] | str,
+    data_file: Path,
     tags: Iterable[Iterable[str]],
     names: Iterable[str],
     fields: Iterable[str],
     all: bool = False,
+    print_output: bool = True,
 ) -> List[Dict[str, str | Dict[str, str]]]:
     """
     Query a file database for items.
 
     Parameters
     ----------
-    file : os.PathLike[str]
+    data_file : Path
         The name of the database file.
     tags : Iterable[Iterable[str]]
         A set of sets of tags - this function will return the union of items that have
@@ -51,19 +51,20 @@ def data_search(
             exit()
 
     if fields == []:
-        return search_file(tags=tags, names=names, filename=file, all=all)
+        return search_file(tags=tags, names=names, filename=data_file, all=all)
 
     filtered_search = filtered_file_search(
-        fields=fields, names=names, tags=tags, filename=file, all=all
+        fields=fields, names=names, tags=tags, filename=data_file, all=all
     )
 
-    print(json.dumps(filtered_search, indent=2))
+    if print_output:
+        print(json.dumps(filtered_search, indent=2))
 
     return filtered_search
 
 
 def data_names(
-    file: os.PathLike[str] | str,
+    data_file: Path,
     tags: Iterable[Iterable[str]],
     names: Iterable[str],
     all: bool = False,
@@ -73,8 +74,8 @@ def data_names(
 
     Parameters
     ----------
-    file : os.PathLike[str]
-        The name of the database file.
+    data_file : Path
+        The path to the database file.
     tags : Iterable[Iterable[str]]
         A set of sets of tags - this function will return the union of items that have
         all of any of the sets of tags passed in.
@@ -93,16 +94,16 @@ def data_names(
             print("'all' cannot be used in conjunction with 'tags' or 'names'.")
             exit()
 
-    return names_only_search(tags=tags, names=names, filename=file, all=all)
+    return names_only_search(tags=tags, names=names, filename=data_file, all=all)
 
 
 def data_fetch(
     tags: Iterable[Iterable[str]],
     names: Iterable[str],
     tests: Sequence[str],
-    file: os.PathLike[str] | str,
-    test_file: os.PathLike[str] | str,
-    cache: os.PathLike[str] | str,
+    data_file: Path,
+    test_file: Path,
+    cache: Path,
     all: bool = False,
     no_cache: bool = False,
     verbose_stderr: bool = False,
@@ -119,12 +120,12 @@ def data_fetch(
         A list of names of data items to return.
     tests : Sequence[str]
         A set of tests to collect all of the input data for in WORKFLOW:TEST format.
-    mount : os.PathLike[str]
-        The location of the cache on the local machine.
-    file : os.PathLike[str]
-        The name of the workflow data database file.
-    test_file : os.PathLike[str]
-        The name of the workflow test database file.
+    data_file : Path
+        The path to the workflow data database file.
+    test_file : Path
+        The path to the workflow test database file.
+    cache : Path
+        The path to the cache folder on the local machine.
     all : bool, optional
         If true, return all of the items in the database. Defaults to False.
     no_cache : bool, optional
@@ -143,10 +144,10 @@ def data_fetch(
     ).strip()
 
     # Acquire the path of the mount on the host
-    host_mount_path = Path(cache)
+    host_mount_path = cache
     # If it isn't already a directory, create it
     if not host_mount_path.is_dir():
-        cmd = ["mkdir", "-p", cache]
+        cmd = ["mkdir", "-p", str(cache)]
         run(cmd, check=True)
     host_mount_abspath = host_mount_path.resolve()
 
@@ -172,7 +173,7 @@ def data_fetch(
             test_info, _ = get_test_info(
                 workflow_name=workflow_name,
                 test_name=test_name,
-                filename=str(test_file),
+                filename=test_file,
             )
 
             # Extract the names of all the inputs from the test info object.
@@ -189,7 +190,12 @@ def data_fetch(
 
     # Find the locations of the data in the database
     data_values = data_search(
-        file=file, tags=tags, names=all_names, fields=["name", "url", "files"], all=all
+        data_file=data_file,
+        tags=tags,
+        names=all_names,
+        fields=["name", "url", "files"],
+        all=all,
+        print_output=False,
     )
 
     # Construct the set of tasks to fetch each data item.
@@ -284,8 +290,9 @@ def _deploy_rover() -> Image:
     Acquires and deploys the Rover image from dockerhub.
 
     ..note:
-        While it isn't typical, there may be some bugged updates to docker that cause
+        While it isn't typical, there may be some bugged updates to Docker that cause
         this to require a dockerhub login. The rover image is public so it shouldn't
+        have this problem.
 
     Returns
     -------

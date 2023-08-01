@@ -18,7 +18,7 @@ _**[Final Notes](#final-notes)**_
 
 # Overview of WIGWAM
 
-WIGWAM is a python command line interface that enables the rapid and flexible production and management of ISCE3 docker images and artifacts. Its' name stands for:
+WIGWAM is a python command line interface that enables the rapid and flexible production and management of ISCE3 Docker images and artifacts. Its' name stands for:
 
 _**WIGWAM: W**orkspace for **I**mage **G**eneration, **W**orkflows, and **A**rtifact **M**anagement_
 
@@ -70,11 +70,11 @@ The setup-all step generates five images: An initialization image which contains
 
 **--tag:** The middle part of the image tag. The full tag of each image will be "wigwam-TAG-SUFFIX" with suffixes in order of generation: "init", "cuda-MAJOR-MINOR-runtime", "mamba-runtime", "cuda-MAJOR-MINOR-dev", "mamba-dev". Defaults to "setup".  
 **--base:** The base image. Recommended and supported base images are "ubuntu" and "oraclelinux:8.4" - any base image not using yum or apt-get, or using operating systems not under the umbrella of CUDA "ubuntu2004" and "rhel8" repositories will fail. Defaults to "oraclelinux:8.4".  
-**--cuda-version:** The cuda version, in MAJOR.MINOR format, e.g "11.0". Defaults to 11.4.  
+**--cuda-version:** The CUDA version, in MAJOR.MINOR format, e.g "11.0". Defaults to 11.4.  
 **--cuda-repo:** The CUDA repository which contains binaries for the base image operating system. Supported repositories include "ubuntu2004" for the ubuntu base image and other images with the Ubuntu 20.04 distro installed, and "rhel8" for the oraclelinux:8.4 base image and others using Oracle Linux or yum. Defaults to "rhel8".  
 **--runtime-env-file:** The path to the runtime environment specfile. WIGWAM supports regular requirements.txt files, environment.yml files, and lockfiles. Defaults to "runtime-spec-file.txt"  
 **--dev-env-file:** The path to the development environment specfile. WIGWAM supports regular requirements.txt files, environment.yml files, and lockfiles. Defaults to "dev-spec-file.txt"  
-**--no-cache:** Using this option causes the docker images to build with no cached steps. This may run slower, but can aid in debugging.
+**--no-cache:** Using this option causes the Docker images to build with no cached steps. This may run slower, but can aid in debugging.
 
 ## Build-All: Acquire and Compile the ISCE3 Framework
 
@@ -186,7 +186,7 @@ To acquire one or more data repositories from an online artifact server, the use
 
 The "wigwam data fetch" command receives a cache location and places data repositories to subfiles within this location. So, if the user requests "DATA\_A" and "DATA\_B" to be cached to "./cache" then WIGWAM will download these repositories to subdirectories "./cache/DATA\_A" and "./cache/DATA\_B".
 
-This command will check your local docker images for an image called "Rover" and automatically download it from dockerhub if it does not exist. Rover is a dockerized utility that enables parallel caching of data repositories in the manner implemented by this system.
+This command will check your local Docker images for an image called "Rover" and automatically download it from dockerhub if it does not exist. Rover is a dockerized utility that enables parallel caching of data repositories in the manner implemented by this system.
 
 **--tags:** A set of tags to search for, separated by spaces - the search will return any data object that has all the provided tags. This argument can be used multiple times - if `--tags` is used more than once, the search function will find any objects that fit all the tags given by any of the `--tags` arguments. Example given below.
 **--names:** A set of data object names to return, given by the names of the repositories. Useful if one or several data objects with easily accessible names are needed.  
@@ -253,7 +253,7 @@ WIGWAM implements the **--help** and **-h** option for all subcommands in the st
 
 When debugging and developing, it can be useful to open a bash shell on an image and navigate within the generated container. WIGWAM contains a simple tool for this:
 
-**IMAGE\_TAG:** The name of any docker image on your system and it will open a bash session within a container on the image. Note that the shell will typically give certain warnings like "I have no name!" – this is expected, as the host user is not necessarily reflected in the image, and should not substantially impair the user.
+**IMAGE\_TAG:** The name of any Docker image on your system and it will open a bash session within a container on the image. Note that the shell will typically give certain warnings like "I have no name!" – this is expected, as the host user is not necessarily reflected in the image, and should not substantially impair the user.
 
 ## Lockfile Generation Tool
 
@@ -275,7 +275,7 @@ When changing the ISCE3 dependency set, users may need to generate new lockfiles
         --quiet (-q)
         --ignore-prefix [!]
 
-Since WIGWAM produces large numbers of docker images, it exposes a simple tool for removing docker images created by the system:
+Since WIGWAM produces large numbers of Docker images, it exposes a simple tool for removing Docker images created by the system:
 
 Docker images generated by this system all come with "wigwam-" as a prefix on their tag. This command permits removal of several images at a time using wildcard characters from the command line, simplifying the removal of intermediate images generated by the system.
 
@@ -283,13 +283,13 @@ Docker images generated by this system all come with "wigwam-" as a prefix on th
 
 For instance: python -m wigwam remove \* searches for and removes all images with the format "wigwam-\*" - that is to say, all non-deployable images generated by WIGWAM.
 
-**--force:** enables the force-deletion of images, which may be necessary in cases where image deletion fails due to some policy of the docker program.  
+**--force:** enables the force-deletion of images, which may be necessary in cases where image deletion fails due to some policy of the Docker program.  
 **--quiet:** enables silent deletion of images without excess print outputs.  
-**--ignore-prefix:** :warning: To be used with extreme caution. :warning: It removes the prefix from the search, enabling the deletion of deployable images and those not generated by WIGWAM. Careless use can result in the unintended deletion of any or all other docker images present on your system.
+**--ignore-prefix:** :warning: To be used with extreme caution. :warning: It removes the prefix from the search, enabling the deletion of deployable images and those not generated by WIGWAM. Careless use can result in the unintended deletion of any or all other Docker images present on your system.
 
 # Advanced Setup & Build Process
 
-For users with specific needs, the Setup All and Full-Compile instructions can be decomposed into further groups of instructions which together form the full ISCE3 image generation process. Users may find it helpful to use these sub-instructions to perform all or part of the process of building ISCE3 docker images.
+For users with specific needs, the Setup All and Full-Compile instructions can be decomposed into further groups of instructions which together form the full ISCE3 image generation process. Users may find it helpful to use these sub-instructions to perform all or part of the process of building ISCE3 Docker images.
 
 ## Setup Instructions
 
@@ -306,7 +306,7 @@ This step creates an initial image with a few basic environment parameters and d
 
 **--tag:** The part of the image tag that follows the prefix. Default is "init".  
 **--base:** The base image. Recommended and supported base images are "ubuntu" and "oraclelinux:8.4" - any base image not using yum or apt-get, or using operating systems not under the umbrella of CUDA "ubuntu2004" and "rhel8" repositories will fail at some point later in the process. Defaults to "oraclelinux:8.4".  
-**--no-cache:** Using this option causes the docker images to build with no cached steps. This may run slower, but can aid in debugging.
+**--no-cache:** Using this option causes the Docker images to build with no cached steps. This may run slower, but can aid in debugging.
 
 ### Setup Cuda Runtime: Build the ISCE3 Runtime CUDA Environment
 
@@ -323,7 +323,7 @@ This step creates an image with the runtime CUDA dependencies installed on it. I
 **--base:** The base image. Recommended to base this image on the init image or some image created from it.  
 **--cuda-version:** The cuda version, in MAJOR.MINOR format, e.g "11.0". Defaults to 11.4.  
 **--cuda-repo:** The CUDA repository which contains binaries for the base image operating system. Supported repositories include "ubuntu2004" for the ubuntu base image and other images with the Ubuntu 20.04 distro installed, and "rhel8" for the oraclelinux:8.4 base image and others using Oracle Linux or yum. Defaults to "rhel8".  
-**--no-cache:** Using this option causes the docker images to build with no cached steps. This may run slower, but can aid in debugging.
+**--no-cache:** Using this option causes the Docker images to build with no cached steps. This may run slower, but can aid in debugging.
 
 ### Setup Env Runtime: Build the ISCE3 Runtime Micromamba Environment
 
@@ -338,7 +338,7 @@ This step creates an image with the runtime micromamba environment installed on 
 **--tag:** The part of the image tag that follows the prefix. Default is "env-runtime".  
 **--base:** The base image. Recommended to base this image on the init image or some image created from it.  
 **--env-file:** The path to the runtime environment specfile. WIGWAM supports regular requirements.txt files, environment.yml files, and lockfiles. Defaults to 'spec-file.txt".  
-**--no-cache:** Using this option causes the docker images to build with no cached steps. This may run slower, but can aid in debugging.
+**--no-cache:** Using this option causes the Docker images to build with no cached steps. This may run slower, but can aid in debugging.
 
 ### Setup Cuda Dev: Build the ISCE3 Development CUDA Environment
 
@@ -351,7 +351,7 @@ This step creates an image with the development CUDA dependencies installed on i
 
 **--tag:** The part of the image tag that follows the prefix. Default is "cuda-dev".  
 **--base:** The base image. Recommended and supported base images are "ubuntu" and "oraclelinux:8.4" - any base image not using yum or apt-get, or using operating systems not under the umbrella of CUDA "ubuntu2004" and "rhel8" repositories will fail at some point later in the process. Defaults to "oraclelinux:8.4".  
-**--no-cache:** Using this option causes the docker images to build with no cached steps. This may run slower, but can aid in debugging.
+**--no-cache:** Using this option causes the Docker images to build with no cached steps. This may run slower, but can aid in debugging.
 
 ### Setup Mamba Dev: Build the ISCE3 Development Runtime Environment
 
@@ -366,13 +366,13 @@ This step creates an image with the development micromamba dependencies added to
 **--tag:** The part of the image tag that follows the prefix. Default is "env-dev".  
 **--base:** The base image. Recommended to base this image on the init image or some image created from it.  
 **--env-file:** The path to the development environment specfile. WIGWAM supports regular requirements.txt files, environment.yml files, and lockfiles. Defaults to 'spec-file.txt".  
-**--no-cache:** Using this option causes the docker images to build with no cached steps. This may run slower, but can aid in debugging.
+**--no-cache:** Using this option causes the Docker images to build with no cached steps. This may run slower, but can aid in debugging.
 
 ## Clone & Insert: Repository Clone/Install Commands
 
 This step of the build takes one of two forms - either acquiring a git repository's head and placing it onto an image, or placing a copy of your local repository on the image. There are two different commands to handle these cases: Clone and Insert.
 
-### Clone: Clone a Git repository onto a docker image
+### Clone: Clone a Git repository onto a Docker image
 
     python -m wigwam clone
         --tag (-t) TAG
@@ -385,7 +385,7 @@ Acquires a Git repo and places it onto a dev image at "/[REPO\_NAME]", and place
 **--base:** The full tag of the image upon this one will be based. Recommended is the dev environment image.  
 **--repo:** A git repository to download. Should be in "user/repository" format. Defaults to "isce-framework/isce3".
 
-### Insert: Insert a local directory into a docker image
+### Insert: Insert a local directory into a Docker image
 
     python -m wigwam insert
         --tag (-t) TAG

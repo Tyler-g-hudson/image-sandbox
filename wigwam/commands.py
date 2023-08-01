@@ -34,7 +34,7 @@ from ._workflows import (
 
 def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = False):
     """
-    Builds a docker image containing the requested Git repository.
+    Builds a Docker image containing the requested Git repository.
 
     .. note:
         With this image, the workdir is moved to the github repo's root directory.
@@ -90,7 +90,7 @@ def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = Fal
 
 def insert(tag: str, base: str, path: str, no_cache: bool = False):
     """
-    Builds a docker image with the contents of the given path copied onto it.
+    Builds a Docker image with the contents of the given path copied onto it.
 
     The directory path on the image has the same name as the topmost directory
     of the given path. e.g. giving path "/tmp/dir/subdir" will result in the contents of
@@ -117,7 +117,7 @@ def insert(tag: str, base: str, path: str, no_cache: bool = False):
     prefixed_base_tag: str = prefix_image_tag(base)
 
     # The absolute path of the given file will be the build context.
-    # This is necessary because otherwise docker may be unable to find the files.
+    # This is necessary because otherwise Docker may be unable to find the files.
     path_absolute = os.path.abspath(path)
     # Additionally, the top directory of the given path will be the name of the
     # directory in the image.
@@ -420,7 +420,7 @@ def test(
     quiet_fail: bool,
 ) -> None:
     """
-    Run all ctests from the docker image work directory.
+    Run all ctests from the Docker image work directory.
 
     Parameters
     ----------
@@ -476,9 +476,9 @@ def workflow(
     test: str,
     input_dirs: Sequence[str],
     cache_dirs: Sequence[str],
-    output_dir: str,
-    test_file: str,
-    scratch_dir: str,
+    output_dir: Path,
+    test_file: Path,
+    scratch_dir: Path,
 ) -> None:
     """Runs a workflow test on the given image.
 
@@ -495,11 +495,11 @@ def workflow(
         format: "[TAG]:[DIRECTORY]" or "[INPUT_NAME]:[DIRECTORY]".
     cache_dirs : Sequence[str]
         A sequence of directories to check for inputs as cache directories.
-    output_dir : str
+    output_dir : Path
         The location of the directory for test outputs.
-    test_file : str
+    test_file : Path
         The location of the JSON file that describes the set of recognized tests.
-    scratch_dir : str
+    scratch_dir : Path
         The name of the scratch directory, optional.
 
     Raises
@@ -532,7 +532,7 @@ def workflow(
                 image=workflow_img,
                 image_tag=image,
                 input_dict=input_dir_map,
-                output_dir=Path(output_dir),
+                output_dir=output_dir,
                 scratch_dir=scratch_dir_absolute,
             )
 
@@ -564,7 +564,7 @@ def workflow(
         elif test_type == "multi":
             # The output directory for multitests is a subdirectory of the given output
             # directory.
-            multi_test_output_dir = Path(output_dir) / workflow_name / test
+            multi_test_output_dir = output_dir / workflow_name / test
             multi_test_scratch_dir = scratch_dir_absolute / workflow_name / test
             # This is a list of test information dictionaries held under the series
             # workflow.

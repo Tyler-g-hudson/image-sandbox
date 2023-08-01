@@ -2,15 +2,17 @@ from __future__ import annotations
 
 import fnmatch
 import json
-import os
 import re
+from pathlib import Path
 from typing import Dict, Iterable, List, Optional
+
+from ._defaults import default_workflowdata_path
 
 
 def names_only_search(
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: os.PathLike[str] | str = "workflowdata.json",
+    filename: Path = default_workflowdata_path(),
     all: bool = False,
 ) -> List[str]:
     """
@@ -24,8 +26,8 @@ def names_only_search(
         the union of all items accepted by all inner iterators. Defaults to [].
     names : Iterable[str], optional
         The names to be matched. Defaults to [].
-    filename : str or path-like, optional
-        The name of the file to search. Defaults to "workflowdata.json".
+    filename : Path, optional
+        The name of the file to search. Defaults to the default workflowdata path.
     all : bool, optional
         If True, ignores other options and returns all items in the file.
         Defaults to False.
@@ -35,9 +37,11 @@ def names_only_search(
     List[str]
         The "name" fields of all accepted items.
     """
+    # Search the data file for applicable data.
     items: List[Dict[str, str | Dict[str, str]]] = search_file(
         tags=tags, names=names, filename=filename, all=all
     )
+    # Get the set of names associated with that data and return it.
     name_list: List[str] = []
     for item in items:
         assert isinstance(item["name"], str)
@@ -50,7 +54,7 @@ def filtered_file_search(
     fields: Iterable[str],
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: os.PathLike[str] | str = "workflowdata.json",
+    filename: Path = default_workflowdata_path(),
     all: bool = False,
 ) -> List[Dict[str, str | Dict[str, str]]]:
     """
@@ -66,8 +70,8 @@ def filtered_file_search(
         the union of all items accepted by all inner iterators. Defaults to [].
     names : Iterable[str], optional
         The names to be matched. Defaults to [].
-    filename : str or path-like, optional
-        The name of the file to search. Defaults to "workflowdata.json".
+    filename : Path, optional
+        The name of the file to search. Defaults to the default workflowdata path.
     all : bool, optional
         If True, ignores other options and returns all items in the file.
         Defaults to False.
@@ -77,9 +81,12 @@ def filtered_file_search(
     List[Dict[str, str or List[str]]]
         The list of items accepted by the search, with filtered tags.
     """
+    # Search the data file for applicable data.
     items: List[Dict[str, str | Dict[str, str]]] = search_file(
         tags=tags, names=names, filename=filename, all=all
     )
+
+    # Get the values at each returned item associated with the given filter.
     return_items: List[Dict[str, str | Dict[str, str]]] = []
     for item in items:
         # The item is a dict. Get all of the desired fields from it.
@@ -95,7 +102,7 @@ def filtered_file_search(
 def search_file(
     tags: Iterable[Optional[Iterable[str]]] = [],
     names: Iterable[Optional[str]] = [],
-    filename: os.PathLike[str] | str = "workflowdata.json",
+    filename: Path = default_workflowdata_path(),
     all: bool = False,
 ) -> List[Dict[str, str | Dict[str, str]]]:
     """
@@ -112,8 +119,8 @@ def search_file(
         the union of all items accepted by all inner iterators. Defaults to [].
     names : Iterable[str], optional
         The names to be matched. Defaults to [].
-    filename : str or path-like, optional
-        The name of the file to search. Defaults to "workflowdata.json".
+    filename : Path, optional
+        The name of the file to search. Defaults to the default workflowdata path.
     all : bool, optional
         If True, ignores other options and returns all items in the file.
         Defaults to False.
@@ -123,12 +130,18 @@ def search_file(
     List[Dict[str, str or List[str]]]
         The list of items accepted by the search.
     """
-    with open(file=filename) as file:
+
+    # Open the data file and load it into a JSON dictionary object.
+    with open(file=str(filename)) as file:
         json_dict = json.load(file)
 
+    # Get everything held underneath the "data" key on the dictionary.
     data: List[Dict[str, str | Dict[str, str]]] = json_dict["data"]
+    # If every item was requested, return everything.
     if all:
         return data
+
+    # Otherwise, filter out only the accepted items using the _accept_item function.
     items: List[Dict[str, str | Dict[str, str]]] = list(
         filter(lambda x: _accept_item(x, tags, names), data)
     )
@@ -160,8 +173,10 @@ def _accept_item(
         -   The tags on the item are a superset of any of the sets of tags given.
         Else False.
     """
+    # Get the name of the item. This name should be a string.
     item_name = item_dict["name"]
     assert isinstance(item_name, str)
+    # For each name in the names list, check if it matches this one. If so, return True.
     for name in names:
         assert isinstance(name, str)
         # Check for the name using a wildcard check.
@@ -169,6 +184,7 @@ def _accept_item(
         if match_object is not None:
             return True
 
+    # Get the tags of the item.
     item_tags = item_dict["tags"]
     # For each tag list in the overall set of lists,
     for tag_list in tags:
@@ -177,4 +193,5 @@ def _accept_item(
         if all(tag in item_tags for tag in tag_list):
             return True
 
+    # If neither of the above returned True, reject the item.
     return False

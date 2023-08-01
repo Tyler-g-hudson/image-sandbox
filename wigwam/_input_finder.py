@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, Sequence, Tuple
 
 
 def get_input_files_for_test(
     test_info: Mapping[str, str | Sequence[Mapping[str, str]] | Mapping[str, str]],
     cache_dirs: Sequence[str],
-    input_dirs: Optional[Sequence[str]] = None,
+    input_dirs: Sequence[str] | None = None,
 ) -> Dict[str, Path]:
     """
     Associates the input repositories needed by a given test with their locations.
@@ -21,10 +21,8 @@ def get_input_files_for_test(
         The name of the test.
     input_dirs : Sequence[str], optional
         The list of input directories in [PATH] or [LABEL]:[PATH] format.
-    cache_dirs : Sequence[str]
+    cache_dirs : Sequence[str] or None
         The list of cache directories.
-    file : str, optional
-        The filename of the workflow test database. Defaults to "workflowtests.json".
 
     Returns
     -------
@@ -52,7 +50,7 @@ def search_for_inputs(
     required_repositories: Sequence[str],
     label_repo_dict: Mapping[str, str],
     cache_dirs: Sequence[os.PathLike[str] | str],
-    input_dirs: Optional[str | Mapping[str, os.PathLike[str] | str]] = None,
+    input_dirs: Path | Mapping[str, Path] | None = None,
 ) -> Dict[str, Path]:
     """
     Finds the locations of all needed input repositories.
@@ -63,9 +61,9 @@ def search_for_inputs(
         The repositories needed.
     label_repo_dict : Mapping[str, str]
         The set of labels assigned to the repositories.
-    cache_dirs : Sequence[os.PathLike[str], str]
+    cache_dirs : Sequence[os.PathLike[str] or str]
         The list of cache directories provided.
-    input_dirs : str | Mapping[str, os.PathLike[str]], optional
+    input_dirs : Path or Mapping[str, Path] or None
         The directory or set of labeled directories provided.
 
     Returns
@@ -81,11 +79,11 @@ def search_for_inputs(
     """
     # If an unlabeled input directory is given, there should only be one needed input.
     # If there are more needed inputs, this constitutes an error.
-    if isinstance(input_dirs, str):
+    if isinstance(input_dirs, Path):
         if len(required_repositories) == 1:
-            return {required_repositories[0]: Path(input_dirs)}
+            return {required_repositories[0]: input_dirs}
         raise ValueError(
-            "Unlabeled input directories only allowed for tests with " "only one input."
+            "Unlabeled input directories only allowed for tests with only one input."
         )
 
     # The dictionary to be output: Maps repositories to their paths.
@@ -98,9 +96,7 @@ def search_for_inputs(
     if input_dirs is not None:
         # A list of the paths provided by the user, to be checked to ensure values that
         # are passed are all used.
-        unmatched_input_dir_paths: List[os.PathLike[str] | str] = list(
-            input_dirs.values()
-        )
+        unmatched_input_dir_paths: List[Path] = list(input_dirs.values())
 
         # Check the user's provided labels for validity.
         accepted_labels = list(
@@ -113,7 +109,7 @@ def search_for_inputs(
             if repo not in unmatched_repositories:
                 raise ValueError(f"Repository {repo} referenced multiple times.")
             path = input_dirs[label]
-            inputs_to_paths[repo] = Path(path)
+            inputs_to_paths[repo] = path
             unmatched_input_dir_paths.remove(path)
             unmatched_repositories.remove(repo)
 
@@ -130,7 +126,9 @@ def search_for_inputs(
         # Find all repos in this cache dir that are in the unmached_repositories list
         # and record their location.
         found_repos = list(
-            filter(lambda repo: (_in_cache(cache_dir, repo)), unmatched_repositories)
+            filter(
+                lambda repo: (_in_cache(Path(cache_dir), repo)), unmatched_repositories
+            )
         )
         for repo in found_repos:
             unmatched_repositories.remove(repo)
@@ -177,13 +175,13 @@ def _in_labels(labeled_dict: Mapping[str, str], label: str) -> bool:
     return True
 
 
-def _in_cache(cache_dir: os.PathLike[str] | str, repo_name: str) -> bool:
+def _in_cache(cache_dir: Path, repo_name: str) -> bool:
     """
     Determines if a repository directory is in a given cache.
 
     Parameters
     ----------
-    cache_dir : os.PathLike[str] | str
+    cache_dir : Path
         The path to the cache directory.
     repo_name : str
         The name of the repository.
@@ -194,8 +192,8 @@ def _in_cache(cache_dir: os.PathLike[str] | str, repo_name: str) -> bool:
         True if the repository name exists as a subdirectory in the first level of the
         cache directory.
     """
-    expected_dir = os.path.join(cache_dir, repo_name)
-    return os.path.isdir(expected_dir)
+    expected_dir = cache_dir / repo_name
+    return os.path.isdir(str(expected_dir))
 
 
 def generate_search_tables(
@@ -244,7 +242,7 @@ def generate_search_tables(
 
 def input_dict_parse(
     kvp_strings: Sequence[str],
-) -> Dict[str, os.PathLike[str] | str] | str:
+) -> Dict[str, Path] | Path:
     """
     Splits a set of strings into key-value pairs in a dictionary.
 
@@ -256,7 +254,7 @@ def input_dict_parse(
 
     Returns
     -------
-    Dict[str, str] | str
+    Dict[str, Path] | Path
         A dictionary containing the key-value pairs of input directory labels and paths,
         or a single string containing the path of the sole input directory.
 
@@ -270,12 +268,12 @@ def input_dict_parse(
     # Populate the above dictionary with each of the strings.
     for kvp in kvp_strings:
         key, value = check_input_kvp(kvp)
-        if key == value:
+        if key == str(value):
             # This will happen if the user passes in [PATH].
             if length == 1:
                 # Praise be unto MyPy. I lay this sacrifice before it so that it may
                 # be appeased upon the day of my pre-commit.
-                assert isinstance(value, str)
+                assert isinstance(value, Path)
                 return value
             ValueError(
                 "Unlabeled input directories only allowed for tests with only "
@@ -286,7 +284,7 @@ def input_dict_parse(
     return ret_dict
 
 
-def check_input_kvp(kvp_str: str) -> Tuple[str, os.PathLike[str] | str]:
+def check_input_kvp(kvp_str: str) -> Tuple[str, Path]:
     """
     Checks an input directory key-value pair string and returns the key and value.
 
@@ -297,8 +295,10 @@ def check_input_kvp(kvp_str: str) -> Tuple[str, os.PathLike[str] | str]:
 
     Returns
     -------
-    Tuple[str, str]
-        The key and value. If [PATH] was given, these are the same.
+    key : str
+        The label in the key-value pair.
+    value : Path
+        The input path in the key-value pair, as a Path.
 
     Raises
     ------
@@ -318,7 +318,7 @@ def check_input_kvp(kvp_str: str) -> Tuple[str, os.PathLike[str] | str]:
     # If the string splits into two, the key is the first split string and the value is
     # the second one.
     if len(kvp) == 2:
-        return kvp[0], kvp[1]
+        return kvp[0], Path(kvp[1])
     # If only one string is returned, then the key and value are the same.
     else:
-        return kvp[0], kvp[0]
+        return kvp[0], Path(kvp[0])

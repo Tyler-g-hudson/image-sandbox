@@ -57,8 +57,8 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         help="If used, the build configuration will not use CUDA.",
     )
 
-    setup_parse = argparse.ArgumentParser(add_help=False)
-    setup_parse.add_argument(
+    setup_params = argparse.ArgumentParser(add_help=False)
+    setup_params.add_argument(
         "--base",
         "-b",
         type=str,
@@ -68,7 +68,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     clone_parser = subparsers.add_parser(
         "clone",
-        parents=[setup_parse, clone_params, no_cache_params],
+        parents=[setup_params, clone_params, no_cache_params],
         help="Set up the GitHub repository image, in [USER]/[REPO_NAME] format.",
         formatter_class=help_formatter,
     )
@@ -76,8 +76,9 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     insert_dir_parser = subparsers.add_parser(
         "insert",
-        parents=[setup_parse, no_cache_params],
-        help="Insert the contents of a file at the given path.",
+        parents=[setup_params, no_cache_params],
+        help="Insert the contents of a file at the given path. Useful for adding a "
+        "local repository to test.",
         formatter_class=help_formatter,
     )
     add_tag_argument(parser=insert_dir_parser, default="filecopy")
@@ -89,9 +90,17 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         help="The path to be copied to the image.",
     )
 
+    clone_parser = subparsers.add_parser(
+        "clone",
+        parents=[setup_params, clone_params],
+        help="Set up the GitHub repository image, in [USER]/[REPO_NAME] format.",
+        formatter_class=help_formatter,
+    )
+    add_tag_argument(parser=clone_parser, default="repo")
+
     config_parser = subparsers.add_parser(
         "config",
-        parents=[setup_parse, config_params, no_cache_params],
+        parents=[setup_params, config_params, no_cache_params],
         help="Creates an image with a configured compiler.",
         formatter_class=help_formatter,
     )
@@ -99,7 +108,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     compile_parser = subparsers.add_parser(
         "compile",
-        parents=[setup_parse, no_cache_params],
+        parents=[setup_params, no_cache_params],
         help="Creates an image with the project built.",
         formatter_class=help_formatter,
     )
@@ -107,7 +116,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     install_parser = subparsers.add_parser(
         "install",
-        parents=[setup_parse, no_cache_params],
+        parents=[setup_params, no_cache_params],
         help="Creates an image with the project installed.",
         formatter_class=help_formatter,
     )
@@ -115,7 +124,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     parser_build_all = subparsers.add_parser(
         "build-all",
-        parents=[setup_parse, config_params, no_cache_params],
+        parents=[setup_params, config_params, no_cache_params],
         help="Performs the complete compilation process, from initial GitHub checkout "
         "to installation.",
         formatter_class=help_formatter,
@@ -125,14 +134,14 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         "-b",
         type=str,
         default="setup-mamba-dev",
-        help='The name of the parent docker image. Default is "setup-mamba-dev".',
+        help='The name of the parent Docker image. Default is "setup-mamba-dev".',
     )
     parser_build_all.add_argument(
         "--tag",
         "-t",
         default="build",
         type=str,
-        help="The sub-prefix of the docker images to be created. Generated images will "
+        help="The sub-prefix of the Docker images to be created. Generated images will "
         f'have tags fitting "{prefix}-[TAG]-*". Default: "build"',
     )
     parser_build_all.add_argument(
@@ -156,14 +165,14 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         "-t",
         default="isce3",
         type=str,
-        help="The complete tag of the docker image to be created. " 'Default: "isce3"',
+        help="The complete tag of the Docker image to be created. " 'Default: "isce3"',
     )
     distrib_parser.add_argument(
         "--base",
         "-b",
         default="setup-mamba-runtime",
         type=str,
-        help="The complete tag of the docker image to be created. "
+        help="The complete tag of the Docker image to be created. "
         'Default: "setup-mamba-runtime"',
     )
     distrib_parser.add_argument(

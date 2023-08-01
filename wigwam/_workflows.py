@@ -12,7 +12,7 @@ from subprocess import CalledProcessError
 from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple
 
 from ._bind_mount import BindMount
-from ._defaults import install_prefix
+from ._defaults import default_workflowtest_path, install_prefix
 from ._exceptions import TestFailedError
 from ._image import Image
 
@@ -88,7 +88,7 @@ def get_workflow_object(workflow_name: str) -> Workflow:
 
 
 def get_test_info(
-    workflow_name: str, test_name: str, filename: str = "workflowtests.json"
+    workflow_name: str, test_name: str, filename: Path = default_workflowtest_path()
 ) -> Tuple[Dict[str, str | List[Dict[str, str]] | Dict[str, str]], str]:
     """
     Get test data from the given file.
@@ -99,8 +99,8 @@ def get_test_info(
         The name of the workflow in the test file.
     test_name : str
         The name of the test under the given workflow.
-    file : str, optional
-        The name of the test. Defaults to "workflowtests.json".
+    filename : Path
+        The path to the workflowtests file. Defaults to the default workflowtest path.
 
     Returns
     -------
@@ -113,7 +113,7 @@ def get_test_info(
         If the workflow is not found, or the supplied test is not a test under the
         given workflow.
     """
-    with open(filename) as file:
+    with open(str(filename)) as file:
         file_dict = json.load(fp=file)
 
     if workflow_name not in file_dict:
@@ -187,7 +187,7 @@ def workflow_mounts(
 
 
 @contextmanager
-def prepare_scratch_dir(scratch_dir: Optional[str]) -> Iterator[Path]:
+def prepare_scratch_dir(scratch_dir: Optional[Path]) -> Iterator[Path]:
     """
     A context manager that returns a scratch directory absolute path.
 
@@ -209,7 +209,7 @@ def prepare_scratch_dir(scratch_dir: Optional[str]) -> Iterator[Path]:
         An absolute path to a scratch directory.
     """
     # If requested, add a path to the scratch directory.
-    # Otherwise, create a temporary one so the docker container can get rw permissions.
+    # Otherwise, create a temporary one so the Docker container can get rw permissions.
     temp_scratch: bool = scratch_dir is None
 
     try:
@@ -217,8 +217,8 @@ def prepare_scratch_dir(scratch_dir: Optional[str]) -> Iterator[Path]:
             # Create the temp scratch file
             return_dir: Path = Path(tempfile.mkdtemp()).absolute()
         else:
-            assert isinstance(scratch_dir, str)
-            return_dir = Path(scratch_dir).absolute()
+            assert isinstance(scratch_dir, Path)
+            return_dir = scratch_dir.absolute()
 
         yield return_dir
 

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
+from .._defaults import default_workflowtest_path
 from ..commands import dropin, make_lockfile, remove, test, workflow
 from ._utils import help_formatter
 
@@ -18,6 +20,26 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
         The image tag prefix.
     """
 
+    test_parser = subparsers.add_parser(
+        "test", help="Run unit tests on an image.", formatter_class=help_formatter
+    )
+    test_parser.add_argument(
+        "tag", metavar="IMAGE_TAG", type=str, help="The tag or ID of the test image."
+    )
+    test_parser.add_argument(
+        "--logfile",
+        "-l",
+        type=str,
+        default="Test.xml",
+        help="The logfile to output test results to.",
+    )
+    test_parser.add_argument(
+        "--compress-output", action="store_true", help="Compress ctest output."
+    )
+    test_parser.add_argument(
+        "--quiet-fail", action="store_true", help="Less verbose output on test failure."
+    )
+
     dropin_parser = subparsers.add_parser(
         "dropin", help="Start a drop-in session.", formatter_class=help_formatter
     )
@@ -32,34 +54,27 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
         formatter_class=help_formatter,
     )
     remove_parser.add_argument(
-        "--force",
-        "-f",
-        action="store_true",
-        help=f"Ignore the {prefix} prefix. CAUTION: Using wildcards with this "
-        "argument can result in unintended removal of docker images. Use "
-        "with caution.",
+        "--force", "-f", action="store_true", help="Force the image removal."
     )
     remove_parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Run the removal with verbose output and error messages.",
+        "--quiet", "-q", action="store_true", help="Run the removal quietly."
     )
     remove_parser.add_argument(
         "--ignore-prefix",
         action="store_true",
-        help=f'An image tag or wildcard. Will be prefixed with "{prefix}" '
-        "if not already prefixed. Wildcard characters * and ? should be escaped "
-        "with backslashes as \\* and \\?. Improper use may cause unpredictable "
-        "removal behavior due to shell interpretation of wildcards.",
+        help=f"WARNING: Ignore the {prefix} prefix. Using wildcards with this "
+        "argument can result in unintended removal of Docker images. Use with "
+        "extreme caution.",
     )
     remove_parser.add_argument(
         "tags",
         metavar="IMAGE_TAG",
         type=str,
         nargs="+",
-        help=f"An image tag or wildcard. Will be prefixed with {prefix} "
-        "if not already prefixed.",
+        help=f'An image tag or wildcard. Will be prefixed with "{prefix}" '
+        "if not already prefixed. Wildcard characters * and ? should be escaped "
+        "with backslashes as \\* and \\?. Improper use may cause unpredictable "
+        "removal behavior due to shell interpretation of wildcards.",
     )
 
     lockfile_parser = subparsers.add_parser(
@@ -86,7 +101,7 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
         metavar="ENVIRONMENT",
         type=str,
         default="base",
-        help="The name of the environment used to create the Dockerfile.",
+        help="The name of the environment used to create the dockerfile.",
     )
 
     workflow_parser = subparsers.add_parser(
@@ -108,20 +123,20 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
         metavar="IMAGE_TAG",
         type=str,
         default="isce3",
-        help='The tag or ID of the image used for testing. Defaults to "isce3".',
+        help="The tag or ID of the image used for testing.",
     )
     workflow_parser.add_argument(
         "--output-dir",
         "-o",
-        type=str,
+        type=Path,
         required=True,
         help="The location to mount output files to.",
     )
     workflow_parser.add_argument(
         "--test-file",
-        type=str,
-        default="workflowtests.json",
-        help="The location of the test info data file. Defaults to workflowtests.json.",
+        type=Path,
+        default=default_workflowtest_path(),
+        help="The location of the test info data file.",
     )
     workflow_parser.add_argument(
         "--input-dirs",
@@ -141,12 +156,10 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
     workflow_parser.add_argument(
         "--scratch-dir",
         "-s",
-        type=str,
+        type=Path,
         default=None,
         help="The location to mount scratch files to, if desired.",
     )
-
-    return
 
 
 def run_util(args: argparse.Namespace, command: str) -> None:
