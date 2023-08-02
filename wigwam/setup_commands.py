@@ -265,7 +265,7 @@ def setup_conda_runtime(
 
     header, body = mamba_install_dockerfile(env_reqs_file=Path(env_file_relative))
     dockerfile = f"{header}\n\nFROM {base}\n\n{body}"
-    
+
     prefixed_tag: str = prefix_image_tag(tag)
     prefixed_base_tag: str = prefix_image_tag(base)
 
@@ -312,7 +312,7 @@ def setup_conda_dev(base: str, tag: str, no_cache: bool, env_file: Path) -> Imag
 
     body = mamba_add_reqs_dockerfile(env_reqs_file=env_file_relative)
 
-    dockerfile = f"FROM {base}\n\n{body}"
+    dockerfile = f"FROM {prefixed_base_tag}\n\n{body}"
 
     return Image.build(
         tag=prefixed_tag,
