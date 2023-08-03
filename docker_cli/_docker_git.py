@@ -1,25 +1,34 @@
 from textwrap import dedent
-from typing import Iterable, List, Tuple
+from typing import Tuple
 
 from ._docker_mamba import micromamba_docker_lines
 
 
 def git_clone_dockerfile(
     git_repo: str,
-    repo_branch: str = "",
+    repo_branch: str = "",  # currently unused. # type: ignore
     git_url: str = "https://github.com",
     folder_name: str = "repo",
 ) -> Tuple[str, str]:
-    """_summary_
+    """
+    Returns a dockerfile-formatted string with instructions to clone a git repository.
+
+    NOTE for reviewers: Branch checkout is currently disabled.
+    Adding branch functionality with this method would require including git in the
+    image if it is not already there, and also pulling in the `.git` info which I
+    believe the ADD command does not include by default. The options as I see them are:
+    -   Remove branching altogether, if acceptable
+    -   Add git and the `.git` folder to the images
+    -   Use a different method of adding git repositories to images.
 
     Parameters
     ----------
     git_repo : str
         The user and name of the git repostiory.
     repo_branch : str, optional
-        The name of the branch to checkout. Defaults to "".
+        The name of the branch to checkout. Defaults to "". Currently disabled.
     git_url : _type_, optional
-        The URL holding the git repository. Defaults to "https://github.com".
+        The URL to get the git repository from. Defaults to "https://github.com/".
     folder_name : str, optional
         The name of the folder to store the repository in. Defaults to "repo".
 
@@ -30,13 +39,6 @@ def git_clone_dockerfile(
     body : str
         The generated dockerfile body.
     """
-
-    instruction: Iterable[str] = git_clone_command(
-        git_repo=git_repo,
-        repo_branch=repo_branch,
-        git_url=git_url,
-        target_location=folder_name,
-    ) + ["&&", "rm", "-rf", f"/{folder_name}/.git*"]
 
     # Dockerfile preparation:
     # Prepare the repository file, ensure proper ownership and permissions.
@@ -62,7 +64,6 @@ def git_clone_dockerfile(
         dedent(
             f"""
         ADD {git_url}/{git_repo}.git /{folder_name}/
-        # RUN {' '. join(instruction)}
 
         WORKDIR /{folder_name}/
         USER $DEFAULT_USER
@@ -71,7 +72,10 @@ def git_clone_dockerfile(
         + "\n"
     )
 
+    # This header enables the dockerfile to use the ADD command for a git repo.
+    # REVIEWERS: I believe this is an experimental syntax and may not be stable.
     header = "# syntax=docker/dockerfile:1-labs"
+
     # Return the generated body plus a header
     return header, body
 
@@ -81,10 +85,33 @@ def git_clone_command(
     repo_branch: str = "",
     git_url: str = "https://github.com/",
     target_location: str = ".",
-) -> List[str]:
-    instruction = ["git", "clone"]
-    if repo_branch != "":
-        instruction.append(f"--branch={repo_branch}")
+) -> str:
+    """
+    Returns a shell command to clone a git repository using HTTPS.
 
-    instruction += [f"{git_url}{git_repo}.git", target_location]
+    NOTE: This function is currently unused. The best method to acquire a git repository
+    is currently unclear, so it is in the codebase as an alternative to the ADD method
+    currently in use.
+
+    Parameters
+    ----------
+    git_repo : str
+        The user and name of the git repostiory.
+    repo_branch : str, optional
+        The name of the branch to checkout. Defaults to "".
+    git_url : str, optional
+        The URL to get the git repository from. Defaults to "https://github.com/".
+    target_location : str, optional
+        The name of the folder to store the repository in. Defaults to ".".
+
+    Returns
+    -------
+    str
+        the command.
+    """
+    instruction = "git clone"
+    if repo_branch != "":
+        instruction += f" --branch={repo_branch}"
+
+    instruction += f" {git_url}{git_repo}.git {target_location}"
     return instruction
