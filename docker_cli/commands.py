@@ -23,7 +23,7 @@ from ._image import Image
 from ._utils import is_conda_pkg_name, test_image, universal_tag_prefix
 
 
-def clone(tag: str, base: str, repo: str, branch: str = ""):
+def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = False):
     """
     Builds a docker image containing the requested Git repository.
 
@@ -40,6 +40,8 @@ def clone(tag: str, base: str, repo: str, branch: str = ""):
         The name of the Git repo (in [USER]/[REPO_NAME] format)
     branch : str
         The branch of the Git repo. Defaults to "".
+    no_cache : bool, optional
+        Run Docker build with no cache if True. Defaults to False.
 
     Returns
     -------
@@ -69,10 +71,10 @@ def clone(tag: str, base: str, repo: str, branch: str = ""):
 
     dockerfile = f"{header}\n\nFROM {base}\n\n{body}"
 
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
+    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=no_cache)
 
 
-def insert(tag: str, base: str, path: str):
+def insert(tag: str, base: str, path: str, no_cache: bool = False):
     """
     Builds a docker image with the contents of the given path copied onto it.
 
@@ -88,6 +90,8 @@ def insert(tag: str, base: str, path: str):
         The base image tag.
     path : str
         The path to be copied.
+    no_cache : bool, optional
+        Run Docker build with no cache if True. Defaults to False.
 
     Returns
     -------
@@ -122,11 +126,16 @@ def insert(tag: str, base: str, path: str):
 
     # Build the image with the context at the absolute path of the given path.
     return Image.build(
-        tag=img_tag, context=path_absolute, dockerfile_string=dockerfile, no_cache=True
+        tag=img_tag,
+        context=path_absolute,
+        dockerfile_string=dockerfile,
+        no_cache=no_cache,
     )
 
 
-def configure(tag: str, base: str, build_type: str, no_cuda: bool) -> Image:
+def configure(
+    tag: str, base: str, build_type: str, no_cuda: bool, no_cache: bool = False
+) -> Image:
     """
     Produces an image with CMAKE configured.
 
@@ -140,22 +149,26 @@ def configure(tag: str, base: str, build_type: str, no_cuda: bool) -> Image:
         The type of CMAKE build.
     no_cuda : bool
         If True, build without CUDA.
+    no_cache : bool, optional
+        Run Docker build with no cache if True. Defaults to False.
 
     Returns
     -------
     Image
         The generated image.
     """
-    body: str = cmake_config_dockerfile(build_type=build_type, with_cuda=not no_cuda)
-
-    dockerfile = f"FROM {base}\n\n{body}"
+    dockerfile: str = cmake_config_dockerfile(
+        base=base,
+        build_type=build_type,
+        with_cuda=not no_cuda,
+    )
 
     prefix = universal_tag_prefix()
     img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
+    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=no_cache)
 
 
-def compile(tag: str, base: str) -> Image:
+def compile(tag: str, base: str, no_cache: bool = False) -> Image:
     """
     Produces an image with the working directory compiled.
 
@@ -165,22 +178,22 @@ def compile(tag: str, base: str) -> Image:
         The image tag.
     base : str
         The base image tag.
+    no_cache : bool, optional
+        Run Docker build with no cache if True. Defaults to False.
 
     Returns
     -------
     Image
         The generated image.
     """
-    body: str = cmake_build_dockerfile()
-
-    dockerfile = f"FROM {base}\n\n{body}"
+    dockerfile: str = cmake_build_dockerfile(base=base)
 
     prefix = universal_tag_prefix()
     img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
+    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=no_cache)
 
 
-def install(tag: str, base: str) -> Image:
+def install(tag: str, base: str, no_cache: bool = False) -> Image:
     """
     Produces an image with the compiled working directory code installed.
 
@@ -193,6 +206,8 @@ def install(tag: str, base: str) -> Image:
         The image tag.
     base : str
         The base image tag.
+    no_cache : bool, optional
+        Run Docker build with no cache if True. Defaults to False.
 
     Returns
     -------
@@ -208,13 +223,11 @@ def install(tag: str, base: str) -> Image:
     else:
         lib = "lib"
 
-    body: str = cmake_install_dockerfile(ld_lib=lib)
-
-    dockerfile = f"FROM {base}\n\n{body}"
+    dockerfile: str = cmake_install_dockerfile(base=base, ld_lib=lib)
 
     prefix = universal_tag_prefix()
     img_tag = tag if tag.startswith(prefix) else f"{prefix}-{tag}"
-    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=True)
+    return Image.build(tag=img_tag, dockerfile_string=dockerfile, no_cache=no_cache)
 
 
 def build_all(
@@ -224,6 +237,7 @@ def build_all(
     repo: Optional[str],
     build_type: str,
     no_cuda: bool,
+    no_cache: bool = False,
     branch: str = "",
 ) -> Dict[str, Image]:
     """
@@ -243,6 +257,8 @@ def build_all(
         The CMAKE build type
     no_cuda : bool
         If True, build without CUDA.
+    no_cache : bool, optional
+        Run Docker build with no cache if True. Defaults to False.
     branch : str
         The branch of the Git repo. Defaults to "".
 
@@ -268,28 +284,43 @@ def build_all(
             top_dir = os.path.basename(os.path.dirname(path_absolute))
 
         insert_tag = f"{prefix}-{tag}-file-{top_dir}"
-        insert_image = insert(base=base, tag=insert_tag, path=copy_path)
+        insert_image = insert(
+            base=base,
+            tag=insert_tag,
+            path=copy_path,
+            no_cache=no_cache,
+        )
         images[insert_tag] = insert_image
         initial_tag = insert_tag
     else:
         git_repo_tag = f"{prefix}-{tag}-git-repo"
         assert repo is not None
-        git_repo_image = clone(base=base, tag=git_repo_tag, repo=repo, branch=branch)
+        git_repo_image = clone(
+            base=base,
+            tag=git_repo_tag,
+            repo=repo,
+            branch=branch,
+            no_cache=no_cache,
+        )
         images[git_repo_tag] = git_repo_image
         initial_tag = git_repo_tag
 
     configure_tag = f"{prefix}-{tag}-configured"
     configure_image = configure(
-        tag=configure_tag, base=initial_tag, build_type=build_type, no_cuda=no_cuda
+        tag=configure_tag,
+        base=initial_tag,
+        build_type=build_type,
+        no_cuda=no_cuda,
+        no_cache=no_cache,
     )
     images[configure_tag] = configure_image
 
     build_tag = f"{prefix}-{tag}-built"
-    build_image = compile(tag=build_tag, base=configure_tag)
+    build_image = compile(tag=build_tag, base=configure_tag, no_cache=no_cache)
     images[build_tag] = build_image
 
     install_tag = f"{prefix}-{tag}-installed"
-    install_image = install(tag=install_tag, base=build_tag)
+    install_image = install(tag=install_tag, base=build_tag, no_cache=no_cache)
     images[install_tag] = install_image
 
     return images
@@ -322,16 +353,13 @@ def distributable(tag: str, base: str, source_tag: str) -> Image:
     else:
         lib = "lib"
 
-    dockerfile: str = cmake_install_dockerfile(ld_lib=lib)
-
-    header, body = distrib_dockerfile(
+    dockerfile = distrib_dockerfile(
+        base=base,
         source_tag=source_tag,
         source_path=install_prefix(),
         distrib_path=install_prefix(),
         ld_lib=lib,
     )
-
-    dockerfile = f"{header}\n\nFROM {base}\n\n{body}"
 
     return Image.build(tag=tag, dockerfile_string=dockerfile, no_cache=True)
 

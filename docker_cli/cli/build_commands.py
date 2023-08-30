@@ -40,6 +40,13 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         help="The name of the branch to checkout. Defaults to \"\"."
     )"""
 
+    no_cache_params = argparse.ArgumentParser(add_help=False)
+    no_cache_params.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="Run Docker build with no cache if used.",
+    )
+
     build_type_choices = ["Release", "Debug", "RelWithDebInfo", "MinSizeRel"]
     config_params = argparse.ArgumentParser(add_help=False)
     config_params.add_argument(
@@ -69,7 +76,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     clone_parser = subparsers.add_parser(
         "clone",
-        parents=[setup_parse, clone_params],
+        parents=[setup_parse, clone_params, no_cache_params],
         help="Set up the GitHub repository image, in [USER]/[REPO_NAME] format.",
         formatter_class=help_formatter,
     )
@@ -77,7 +84,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     insert_dir_parser = subparsers.add_parser(
         "insert",
-        parents=[setup_parse],
+        parents=[setup_parse, no_cache_params],
         help="Insert the contents of a file at the given path.",
         formatter_class=help_formatter,
     )
@@ -92,7 +99,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     config_parser = subparsers.add_parser(
         "config",
-        parents=[setup_parse, config_params],
+        parents=[setup_parse, config_params, no_cache_params],
         help="Creates an image with a configured compiler.",
         formatter_class=help_formatter,
     )
@@ -100,7 +107,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     compile_parser = subparsers.add_parser(
         "compile",
-        parents=[setup_parse],
+        parents=[setup_parse, no_cache_params],
         help="Creates an image with the project built.",
         formatter_class=help_formatter,
     )
@@ -108,7 +115,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     install_parser = subparsers.add_parser(
         "install",
-        parents=[setup_parse],
+        parents=[setup_parse, no_cache_params],
         help="Creates an image with the project installed.",
         formatter_class=help_formatter,
     )
@@ -116,7 +123,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     parser_build_all = subparsers.add_parser(
         "build-all",
-        parents=[setup_parse, config_params],
+        parents=[setup_parse, config_params, no_cache_params],
         help="Performs the complete compilation process, from initial GitHub checkout "
         "to installation.",
         formatter_class=help_formatter,
@@ -147,7 +154,10 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
     )
 
     distrib_parser = subparsers.add_parser(
-        "distrib", help="Creates a distributable image.", formatter_class=help_formatter
+        "distrib",
+        parents=[no_cache_params],
+        help="Creates a distributable image.",
+        formatter_class=help_formatter,
     )
     distrib_parser.add_argument(
         "--tag",

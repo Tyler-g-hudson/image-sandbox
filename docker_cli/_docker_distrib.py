@@ -2,22 +2,24 @@ from __future__ import annotations
 
 import os
 from textwrap import dedent
-from typing import Tuple
 
 from ._docker_cmake import install_prefix
 
 
 def distrib_dockerfile(
+    base: str,
     source_tag: str,
     source_path: os.PathLike[str] | str,
     distrib_path: os.PathLike[str] | str,
     ld_lib: str,
-) -> Tuple[str, str]:
+) -> str:
     """
     Returns a dockerfile for a distributable build.
 
     Parameters
     ----------
+    base : str
+        The base image tag.
     source_tag : str
         The tag of the image on which the project is installed.
     source_path : os.PathLike[str] or str
@@ -29,25 +31,26 @@ def distrib_dockerfile(
 
     Returns
     -------
-    header
-        The generated dockerfile header.
-    body
-        The generated dockerfile body.
+    dockerfile: str
+        The generated Dockerfile.
     """
-    header = f"FROM {source_tag} as source"
-    body = dedent(
+    dockerfile: str = dedent(
         f"""
-        USER root
+            FROM {source_tag} as source
 
-        COPY --from=source {source_path} {distrib_path}
+            FROM {base}
 
-        ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:{install_prefix()}/{ld_lib}
-        ENV PYTHONPATH $PYTHONPATH:{install_prefix()}/packages
+            USER root
 
-        USER $DEFAULT_USER
-        ENV ISCE3_PREFIX={distrib_path}
-        WORKDIR $ISCE3_PREFIX
+            COPY --from=source {source_path} {distrib_path}
+
+            ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:{install_prefix()}/{ld_lib}
+            ENV PYTHONPATH $PYTHONPATH:{install_prefix()}/packages
+
+            USER $DEFAULT_USER
+            ENV ISCE3_PREFIX={distrib_path}
+            WORKDIR $ISCE3_PREFIX
         """
     ).strip()
 
-    return header, body
+    return dockerfile
