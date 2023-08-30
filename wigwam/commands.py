@@ -75,10 +75,7 @@ def clone(tag: str, base: str, repo: str, branch: str = "", no_cache: bool = Fal
     repo_name = match_dict["repo"]
 
     dockerfile = git_clone_dockerfile(
-        base=prefixed_base_tag,
-        git_repo=repo,
-        repo_branch=branch,
-        repo_name=repo_name
+        base=prefixed_base_tag, git_repo=repo, repo_branch=branch, folder_name=repo_name
     )
 
     return Image.build(
@@ -176,9 +173,7 @@ def configure(
     prefixed_base_tag: str = prefix_image_tag(base)
 
     dockerfile: str = cmake_config_dockerfile(
-        base=prefixed_base_tag,
-        build_type=build_type,
-        with_cuda=not no_cuda
+        base=prefixed_base_tag, build_type=build_type, with_cuda=not no_cuda
     )
 
     return Image.build(
@@ -333,7 +328,7 @@ def build_all(
             base=prefixed_base_tag,
             tag=git_repo_tag,
             repo=repo,
-            branch=branch
+            branch=branch,
             no_cache=no_cache,
         )
         images[git_repo_tag] = git_repo_image
@@ -360,7 +355,7 @@ def build_all(
     install_tag = f"{prefixed_tag}-installed"
     install_image = install(
         tag=install_tag,
-        base=build_tag
+        base=build_tag,
         no_cache=no_cache,
     )
     images[install_tag] = install_image
@@ -406,11 +401,7 @@ def distrib(tag: str, base: str, source_tag: str) -> Image:
         ld_lib=lib,
     )
 
-    return Image.build(
-        tag=tag,
-        dockerfile_string=dockerfile,
-        no_cache=True
-    )
+    return Image.build(tag=tag, dockerfile_string=dockerfile, no_cache=True)
 
 
 def test(

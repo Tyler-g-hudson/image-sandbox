@@ -1,15 +1,15 @@
 from textwrap import dedent
-from typing import Tuple
 
 from ._docker_mamba import micromamba_docker_lines
 
 
 def git_clone_dockerfile(
+    base: str,
     git_repo: str,
     repo_branch: str = "",  # currently unused. # type: ignore
     git_url: str = "https://github.com",
     folder_name: str = "repo",
-) -> Tuple[str, str]:
+) -> str:
     """
     Returns a dockerfile-formatted string with instructions to clone a git repository.
 
@@ -23,6 +23,8 @@ def git_clone_dockerfile(
 
     Parameters
     ----------
+    base : str
+        The base image tag.
     git_repo : str
         The user and name of the git repostiory.
     repo_branch : str, optional
@@ -77,7 +79,7 @@ def git_clone_dockerfile(
     header = "# syntax=docker/dockerfile:1-labs"
 
     # Return the generated body plus a header
-    return header, body
+    return f"{header}\n\nFROM{base}\n\n{body}"
 
 
 def git_clone_command(
