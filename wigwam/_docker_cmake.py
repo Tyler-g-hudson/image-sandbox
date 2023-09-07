@@ -43,7 +43,6 @@ def cmake_config_dockerfile(base: str, build_type: str, with_cuda: bool = True) 
         f"""
             ENV INSTALL_PREFIX {str(install_prefix())}
             ENV BUILD_PREFIX {str(build_prefix())}
-            ENV PYTHONPATH $INSTALL_PREFIX/packages:$PYTHONPATH
 
             RUN cmake \\
                 -S {src_prefix()}
@@ -119,6 +118,7 @@ def cmake_install_dockerfile(base: str, ld_lib: str) -> str:
             RUN mkdir /tmp/Testing
 
             ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$INSTALL_PREFIX/{ld_lib}
+            ENV PYTHONPATH $INSTALL_PREFIX/packages:$PYTHONPATH
             WORKDIR $BUILD_PREFIX
         """
     ).strip()
