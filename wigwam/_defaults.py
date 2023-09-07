@@ -37,6 +37,18 @@ def build_prefix() -> str:
     return "/tmp/build"
 
 
+def src_prefix() -> str:
+    """
+    Returns the filesystem prefix to the source code.
+
+    Returns
+    -------
+    str
+        The source prefix.
+    """
+    return "."
+
+
 def default_workflowdata_path() -> Path:
     """The default workflowdata.json path"""
     return Path("workflowdata.json")
