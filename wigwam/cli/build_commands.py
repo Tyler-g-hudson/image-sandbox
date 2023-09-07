@@ -47,7 +47,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         default="Release",
         metavar="CMAKE_BUILD_TYPE",
         choices=build_type_choices,
-        help="The CMAKE_BUILD_TYPE argument for CMAKE. Valid options are: "
+        help="The CMAKE_BUILD_TYPE argument for CMake. Valid options are: "
         + f"{', '.join(build_type_choices)}. Defaults to \"Release\".",
     )
     config_params.add_argument(

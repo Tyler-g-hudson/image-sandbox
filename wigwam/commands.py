@@ -148,7 +148,7 @@ def configure(
     tag: str, base: str, build_type: str, no_cuda: bool, no_cache: bool = False
 ) -> Image:
     """
-    Produces an image with CMAKE configured.
+    Produces an image with CMake configured.
 
     Parameters
     ----------
@@ -157,7 +157,9 @@ def configure(
     base : str
         The base image tag.
     build_type : str
-        The type of CMAKE build.
+        The CMake build type. See
+        `here <https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html>`_
+        for possible values.
     no_cuda : bool
         If True, build without CUDA.
     no_cache : bool, optional
@@ -281,7 +283,9 @@ def build_all(
     repo : str or None
         The name of the Git repo, in [USER]/[REPO_NAME] format
     build_type : str
-        The CMAKE build type
+        The CMake build type. See
+        `here <https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html>`_
+        for possible values.
     no_cuda : bool
         If True, build without CUDA.
     no_cache : bool, optional

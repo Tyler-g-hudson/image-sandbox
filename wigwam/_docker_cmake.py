@@ -62,7 +62,7 @@ def cmake_config_dockerfile(base: str, build_type: str, with_cuda: bool = True) 
 
 def cmake_build_dockerfile(base: str) -> str:
     """
-    Creates a dockerfile for compiling with CMAKE.
+    Creates a dockerfile for compiling with CMake.
 
     Parameters
     ----------
@@ -88,7 +88,7 @@ def cmake_build_dockerfile(base: str) -> str:
 
 def cmake_install_dockerfile(base: str, ld_lib: str) -> str:
     """
-    Creates a dockerfile for installing with CMAKE.
+    Creates a dockerfile for installing with CMake.
 
     Parameters
     ----------
