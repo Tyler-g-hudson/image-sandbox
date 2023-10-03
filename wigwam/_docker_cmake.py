@@ -79,7 +79,7 @@ def cmake_build_dockerfile(base: str) -> str:
     # Run as the $MAMBA_USER and activate the micromamba environment.
     dockerfile += f"{micromamba_docker_lines()}\n\n"
 
-    # build the project.
+    # Build the project.
     dockerfile += "RUN cmake --build $BUILD_PREFIX --parallel"
 
     return dockerfile
