@@ -90,14 +90,6 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
         help="The path to be copied to the image.",
     )
 
-    clone_parser = subparsers.add_parser(
-        "clone",
-        parents=[setup_params, clone_params],
-        help="Set up the GitHub repository image, in [USER]/[REPO_NAME] format.",
-        formatter_class=help_formatter,
-    )
-    add_tag_argument(parser=clone_parser, default="repo")
-
     config_parser = subparsers.add_parser(
         "config",
         parents=[setup_params, config_params, no_cache_params],
@@ -124,7 +116,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     parser_build_all = subparsers.add_parser(
         "build-all",
-        parents=[setup_params, config_params, no_cache_params],
+        parents=[config_params, no_cache_params],
         help="Performs the complete compilation process, from initial GitHub checkout "
         "to installation.",
         formatter_class=help_formatter,
