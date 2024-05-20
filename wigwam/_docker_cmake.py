@@ -45,7 +45,7 @@ def cmake_config_dockerfile(base: str, build_type: str, with_cuda: bool = True) 
             ENV BUILD_PREFIX {str(build_prefix())}
 
             RUN cmake \\
-                -S {src_prefix()}
+                -S {src_prefix()} \\
                 -B $BUILD_PREFIX \\
                 -G Ninja \\
                 -D ISCE3_FETCH_DEPS=NO \\

@@ -116,7 +116,7 @@ def init_build_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> N
 
     parser_build_all = subparsers.add_parser(
         "build-all",
-        parents=[config_params, no_cache_params],
+        parents=[clone_params, config_params, no_cache_params],
         help="Performs the complete compilation process, from initial GitHub checkout "
         "to installation.",
         formatter_class=help_formatter,

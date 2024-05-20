@@ -79,7 +79,7 @@ def git_clone_dockerfile(
     header = "# syntax=docker/dockerfile:1-labs"
 
     # Return the generated body plus a header
-    return f"{header}\n\nFROM{base}\n\n{body}"
+    return f"{header}\n\nFROM {base}\n\n{body}"
 
 
 def git_clone_command(
