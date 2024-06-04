@@ -475,7 +475,7 @@ def test(
     image.run(command=command, host_user=True, bind_mounts=[bind_mount])
 
 
-def dropin(tag: str, default_user: bool = False) -> None:
+def dropin(tag: str, default_user: bool = False, use_prefix: bool = True) -> None:
     """
     Initiates a drop-in session on an image.
 
@@ -487,7 +487,8 @@ def dropin(tag: str, default_user: bool = False) -> None:
         If True, run as the default user in the image. Else, run as the current user on
         the host machine. Defaults to False.
     """
-    tag = prefix_image_tag(tag)
+    if use_prefix:
+        tag = prefix_image_tag(tag)
     image: Image = Image(tag)
 
     image.drop_in(host_user=not default_user)

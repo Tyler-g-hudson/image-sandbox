@@ -50,6 +50,14 @@ def init_util_parsers(subparsers: argparse._SubParsersAction, prefix: str) -> No
         help="Run as the default user on the image. If not used, will run as the "
         "current user on the host machine.",
     )
+    dropin_parser.add_argument(
+        "--no-prefix",
+        action="store_false",
+        dest="use_prefix",
+        default=True,
+        help="Run as the default user on the image. If not used, will run as the "
+        "current user on the host machine.",
+    )
 
     remove_parser: argparse.ArgumentParser = subparsers.add_parser(
         "remove",
